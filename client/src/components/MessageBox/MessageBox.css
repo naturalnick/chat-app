@@ -1,0 +1,9 @@
+.message-box {
+	height: 400px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	overflow-wrap: break-word;
+	border: 1px solid lightgrey;
+	border-radius: 5px;
+	padding: 10px;
+}
