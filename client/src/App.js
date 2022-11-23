@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -6,8 +7,10 @@ import "./App.css";
 import SearchBar from "./components/SearchBar/SearchBar";
 import StatusBar from "./components/StatusBar/StatusBar";
 import MessageBox from "./components/MessageBox/MessageBox";
+import Login from "./components/Login/Login";
 
 export default function App() {
+	const [authenticated, setAuthenticated] = useState(null);
 	const [messages, setMessages] = useState([]);
 
 	function getMessages() {
@@ -20,6 +23,10 @@ export default function App() {
 	}
 
 	useEffect(() => {
+		const loggedInUser = localStorage.getItem("authenticated");
+		if (loggedInUser) {
+			setAuthenticated(loggedInUser);
+		}
 		// getMessages();
 	}, []);
 
@@ -46,20 +53,25 @@ export default function App() {
 		]);
 	}
 	console.log("render");
-	return (
-		<div className="App">
-			<Container>
-				<Row>
-					<Col md={4}>
-						<StatusBar />
-					</Col>
-					<Col md={8}>
-						<h2>Messages</h2>
-						<MessageBox messages={messages} />
-						<SearchBar handleSubmit={handleSubmit} />
-					</Col>
-				</Row>
-			</Container>
-		</div>
-	);
+	if (!authenticated) {
+		return <Navigate replace to="/login" />;
+	} else {
+		return (
+			<div className="App">
+				<Login />
+				<Container>
+					<Row>
+						<Col md={4}>
+							<StatusBar />
+						</Col>
+						<Col md={8}>
+							<h2>Messages</h2>
+							<MessageBox messages={messages} />
+							<SearchBar handleSubmit={handleSubmit} />
+						</Col>
+					</Row>
+				</Container>
+			</div>
+		);
+	}
 }

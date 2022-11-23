@@ -1,43 +1,12 @@
 from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from datetime import datetime
+from bcrypt import hashpw, checkpw, gensalt
+import jwt
 import db_access
 
 app = Flask(__name__, static_folder="../client/build/static", template_folder="../client/build")
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-users = [
-		{
-			"name": "Nick",
-			"isOnline": "true",
-		},
-		{
-			"name": "Rob",
-			"isOnline": "true",
-		},
-	]
-messages = [
-	{
-		"id": "1",
-		"user": "Nick",
-		"text": "Hello World",
-	},
-	{
-		"id": "2",
-		"user": "Nick",
-		"text": "Second Message",
-	},
-	{
-		"id": "3",
-		"user": "Rob",
-		"text": "I like to play video games.",
-	},
-	{
-		"id": "4",
-		"user": "Rob",
-		"text": "This is a second Message",
-	},
-]
 
 @app.route("/")
 def index():
@@ -65,16 +34,39 @@ def get_users():
 			else: return "Not Found", 404
 	else:
 		return jsonify(db_access.get_users())
-	return "Users", 200
 
 @app.route("/api/users", methods=["POST"])
 def add_user():
 	user_name = request.json["name"]
-	date = datetime.now().strftime("%d/%m/%Y")
 	#online_status = request.json["isOnline"]
-	db_access.create_user(user_name, date)
+	db_access.create_user(user_name)
 	#users.append({"id": user_id, "name": user_name})
 	return "Users", 201
+
+@app.route("/api/auth/signin", methods=['POST'])
+def sign_in():
+	username = request.json["username"]
+	password = request.json["password"]
+	user = db_access.get_user(username)
+	# Check that a user matching the username exists, and that the password matches
+	if user != None and checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
+		print("set JWT")
+		payload_data = {"username": username, "password": password}
+		encoded_jwt = jwt.encode(payload_data, "secret", algorithm="HS256")
+		return jsonify({"data": "None"}), 200
+	else:
+		return jsonify({"data": "None"}), 200
+
+@app.route("/api/auth/signup", methods=['POST'])
+def sign_up():
+	username = request.json["username"]
+	email = request.json["email"]
+	password = request.json["password"]
+	if db_access.get_user(username) != None:
+		return jsonify({"data": "None"}), 409
+	if username and password:
+		db_access.create_user(username, password)
+	return jsonify({"data": "None"}), 200
 
 if __name__=="__main__":
 	app.run(debug=True)
