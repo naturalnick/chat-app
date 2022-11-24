@@ -5,6 +5,7 @@ import Container from "react-bootstrap/esm/Container";
 import Form from "react-bootstrap/Form";
 import "./Login.css";
 import Button from "react-bootstrap/esm/Button";
+import { useEffect } from "react";
 
 export default function Login() {
 	const navigate = useNavigate();
@@ -27,7 +28,10 @@ export default function Login() {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				console.log("Success:", data);
+				console.log(data);
+				setAuthenticated(true);
+				localStorage.setItem("authenticated", true);
+				navigate("/");
 			})
 			.catch((error) => {
 				console.error("Error:", error);
@@ -44,7 +48,8 @@ export default function Login() {
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				console.log("Success:", data);
+				console.log(data);
+				navigate("/");
 			})
 			.catch((error) => {
 				console.error("Error:", error);
