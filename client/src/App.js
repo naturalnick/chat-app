@@ -10,7 +10,9 @@ import MessageBox from "./components/MessageBox/MessageBox";
 import Login from "./components/Login/Login";
 
 export default function App() {
-	const [authenticated, setAuthenticated] = useState(null);
+	const [isLoggedIn, setIsLoggedIn] = useState(
+		localStorage.getItem(localStorage.getItem("authenticated") || false)
+	);
 	const [messages, setMessages] = useState([]);
 
 	function getMessages() {
@@ -23,9 +25,8 @@ export default function App() {
 	}
 
 	useEffect(() => {
-		const loggedInUser = localStorage.getItem("authenticated");
-		if (loggedInUser) {
-			setAuthenticated(loggedInUser);
+		if (localStorage.getItem("authenticated")) {
+			setIsLoggedIn(true);
 		}
 		// getMessages();
 	}, []);
@@ -53,7 +54,7 @@ export default function App() {
 		]);
 	}
 	console.log("render");
-	if (!authenticated) {
+	if (!isLoggedIn) {
 		return <Navigate replace to="/login" />;
 	} else {
 		return (
