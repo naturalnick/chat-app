@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { io } from "socket.io-client";
+import { SocketContext } from "../../context/socket";
 import Container from "react-bootstrap/esm/Container";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/esm/Button";
 import "./Login.css";
 
-const socket = io.connect();
-
 export default function Login() {
+	const socket = useContext(SocketContext);
 	const [isRegistering, setIsRegistering] = useState(false);
+	const [error, setError] = useState("");
 	const {
 		register,
 		handleSubmit,
@@ -31,13 +31,19 @@ export default function Login() {
 			setAuthenticated(true);
 		});
 		socket.on("invalid", () => {
-			console.log("invalid");
+			setError(
+				isRegistering
+					? "Username already exists."
+					: "Username or password is incorrect."
+			);
 		});
 		socket.on("error", () => {
 			console.log("error");
 		});
 		return () => {
 			socket.off("logged_in");
+			socket.off("invalid");
+			socket.off("error");
 		};
 	}, []);
 
@@ -49,6 +55,7 @@ export default function Login() {
 		<Container className="Login">
 			{authenticated && <Navigate to="/" replace={true} />}
 			<h1>{isRegistering ? "Register" : "Sign In"}</h1>
+			<p className="error">{error}</p>
 			<Form>
 				<Form.Group className="mb-3">
 					<Form.Label>Username</Form.Label>

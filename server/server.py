@@ -21,55 +21,19 @@ def index():
 # 	db_access.create_message(user_name, text, date)
 # 	return "Messages", 200
 
-# @app.route("/api/users", methods=["GET"])
-# def get_users():
-# 	users = db_access.get_users()
-# 	print(check_jwt(request.headers["Authorization"]))
-# 	if "id" in request.args:
-# 		for user in users:
-# 			if user.id == request.args["id"]:
-# 				return user
-# 			else: return "Not Found", 404
-# 	else:
-# 		return jsonify(db_access.get_users())
-
 def check_jwt(token):
 	decoded = jwt.decode(token, "secret", algorithms="HS256")
 	return True if decoded else False
 
-# @app.route("/api/auth/signin", methods=['POST'])
-# def sign_in():
-# 	print("got here")
-# 	username = request.json["username"]
-# 	password_entered = request.json["password"].encode('utf-8')
-# 	user = db_access.get_user(username)
-# 	print(user)
-# 	password_to_compare = user['password'].encode('utf-8')
-
-# 	if user != None and check_pw(password_entered, password_to_compare):
-# 		payload = {"username": username}
-# 		encoded_jwt = jwt.encode(payload, "secret", algorithm="HS256")
-# 		return jsonify({"jwt": encoded_jwt}), 200
-# 	else:
-# 		return jsonify({"data": "None"}), 200
-
-# @app.route("/api/auth/signup", methods=['POST'])
-# def sign_up():
-# 	username = request.json["username"]
-# 	password = request.json["password"]
-
-# 	if db_access.get_user(username) != None:
-# 		return jsonify({"data": "user already exists"}), 409
-# 	elif username and password:
-# 		db_access.create_user(username, password)
-# 	return jsonify({"data": "None"}), 200
+def get_jwt_payload(token):
+	return jwt.decode(token, "secret", algorithms="HS256")
 
 @socketio.on("connect")
-def connected():
-	print("client has connected")
+def client_connect():
+	emit("connected")
 
 @socketio.on("ping")
-def handle_messages():
+def check():
     print("pinged")	
     
 @socketio.on("retrieve_users")
@@ -78,23 +42,36 @@ def send_users(token):
 		users = db_access.get_users()
 		emit("user_list", users)
 
-@socketio.on("retrieve_msgs")
+@socketio.on("retrieve_messages")
 def send_messages(token):
 	if check_jwt(token):
 		msgs = db_access.get_messages()
 		emit("messages", msgs)
 
+@socketio.on("message")
+def receive_message(message):
+	if check_jwt(message["token"]):
+		payload = get_jwt_payload(message["token"])
+		username = payload["username"]
+		text = message["text"]
+		db_access.create_message(username, text)
+		print(db_access.get_messages())
+
 @socketio.on("login_register")
-def handle_message(data):
-	print(data)
+def handle_login(data):
 	username = data["username"]
 	password = data['password']
-	user = db_access.get_user(username, password)
-	if user != None and data["type"] == "login":
+	userExists = db_access.check_user(username)
+	if userExists and data["type"] == "login" and db_access.get_user(username, password):
 		payload = {"username": username}
 		encoded_jwt = jwt.encode(payload, "secret", algorithm="HS256")
 		emit("logged_in", {"jwt": encoded_jwt}, broadcast=True)
-	elif user == None and data["type"] == "register":#and type is register
+	elif not userExists and data["type"] == "login":
+		emit("invalid")
+	elif userExists and data["type"] == "register":
+		emit("invalid")
+	elif not userExists and data["type"] == "register":
+		print("create new")
 		db_access.create_user(username, password)
     
 @socketio.on("disconnect")
