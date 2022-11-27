@@ -19,11 +19,12 @@ def create_user(user_name, password):
 		cur.execute(f"INSERT INTO users (user_name, date_created, password) VALUES('{user_name}','{date}', crypt('{password}', gen_salt('bf')))")
 	conn.commit()
 
-def get_user(user_name):
+def get_user(user_name, password):
 	try:
 		with conn.cursor() as cur:
-			cur.execute(f"SELECT * FROM users WHERE user_name = '{user_name}'")
+			cur.execute(f"SELECT * FROM users WHERE user_name = '{user_name}' AND password = crypt('{password}', password)")
 			user = cur.fetchone()
+			print(user)
 			userDict = dict(id = user[0], username = user[1], date_created = user[2], password = user[3])
 		return userDict
 	except:

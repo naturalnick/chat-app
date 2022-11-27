@@ -1,63 +1,54 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { io } from "socket.io-client";
 import Container from "react-bootstrap/esm/Container";
 import Form from "react-bootstrap/Form";
-import "./Login.css";
 import Button from "react-bootstrap/esm/Button";
-import { useEffect } from "react";
+import "./Login.css";
+
+const socket = io.connect();
 
 export default function Login() {
-	const navigate = useNavigate();
+	const [isRegistering, setIsRegistering] = useState(false);
 	const {
 		register,
 		handleSubmit,
+		setValue,
 		formState: { errors },
 	} = useForm();
-	const [authenticated, setAuthenticated] = useState(
-		localStorage.getItem(localStorage.getItem("authenticated") || false)
-	);
+	const [authenticated, setAuthenticated] = useState(() => {
+		return localStorage.getItem("authentication") ? true : false;
+	});
+
+	useEffect(() => {
+		setValue("type", isRegistering ? "register" : "login");
+	}, [isRegistering]);
+
+	useEffect(() => {
+		socket.on("logged_in", (data) => {
+			localStorage.setItem("authentication", data.jwt);
+			setAuthenticated(true);
+		});
+		socket.on("invalid", () => {
+			console.log("invalid");
+		});
+		socket.on("error", () => {
+			console.log("error");
+		});
+		return () => {
+			socket.off("logged_in");
+		};
+	}, []);
 
 	const onSignIn = (data) => {
-		fetch("http://127.0.0.1:5000/api/auth/signin", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(data),
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				console.log(data);
-				setAuthenticated(true);
-				localStorage.setItem("authenticated", true);
-				navigate("/");
-			})
-			.catch((error) => {
-				console.error("Error:", error);
-			});
+		socket.emit("login_register", data);
 	};
 
-	const onSignUp = (data) => {
-		fetch("http://127.0.0.1:5000/api/auth/signup", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(data),
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				console.log(data);
-				navigate("/");
-			})
-			.catch((error) => {
-				console.error("Error:", error);
-			});
-	};
 	return (
 		<Container className="Login">
-			<h1>Sign In</h1>
+			{authenticated && <Navigate to="/" replace={true} />}
+			<h1>{isRegistering ? "Register" : "Sign In"}</h1>
 			<Form>
 				<Form.Group className="mb-3">
 					<Form.Label>Username</Form.Label>
@@ -78,23 +69,6 @@ export default function Login() {
 					)}
 				</Form.Group>
 				<Form.Group className="mb-3">
-					<Form.Label>Email address</Form.Label>
-					<Form.Control
-						type="email"
-						placeholder="name@example.com"
-						{...register("email", {
-							required: true,
-							pattern:
-								/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-						})}
-					/>
-					{errors.email && (
-						<Form.Text className="warning">
-							Email address not valid.
-						</Form.Text>
-					)}
-				</Form.Group>
-				<Form.Group className="mb-3">
 					<Form.Label>Password</Form.Label>
 					<Form.Control
 						type="password"
@@ -108,8 +82,22 @@ export default function Login() {
 						<Form.Text className="warning">Password not valid.</Form.Text>
 					)}
 				</Form.Group>
-				<Button onClick={handleSubmit(onSignIn)}>Sign In</Button> OR
-				<Button onClick={handleSubmit(onSignUp)}>Sign Up</Button>
+				<Button onClick={handleSubmit(onSignIn)}>
+					{isRegistering ? "Sign Up" : "Sign In"}
+				</Button>
+				<p className="p-login">
+					{isRegistering ? "Already a member? " : "Not a member? "}
+					<span
+						className="switch-login"
+						onClick={() => {
+							setIsRegistering(
+								(prevIsRegistering) => !prevIsRegistering
+							);
+						}}
+					>
+						{isRegistering ? "Sign In" : "Register"}
+					</span>
+				</p>
 			</Form>
 		</Container>
 	);
