@@ -1,20 +1,15 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { SocketContext } from "../../context/socket";
 import ListGroup from "react-bootstrap/ListGroup";
 
-export default function StatusBar() {
+export default function StatusBar({ token }) {
 	const [users, setUsers] = useState([]);
-	function getUsers() {
-		fetch("http://127.0.0.1:5000/api/users", { method: "GET" })
-			.then((response) => response.json())
-			.then((data) => setUsers(data))
-			.catch((error) => {
-				console.log("Error: ", error);
-			});
-	}
-
+	const socket = useContext(SocketContext);
 	useEffect(() => {
-		getUsers();
+		socket.on("user_list", (users) => {
+			setUsers(users);
+		});
+		socket.emit("retrieve_users", token);
 	}, []);
 
 	const userElements = users.map((user) => (
