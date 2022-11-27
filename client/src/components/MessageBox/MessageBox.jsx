@@ -7,6 +7,7 @@ export default function MessageBox({ token }) {
 	const socket = useContext(SocketContext);
 	useEffect(() => {
 		socket.on("messages", (messages) => {
+			console.log(messages);
 			setMessages(messages);
 		});
 		socket.emit("retrieve_messages", token);
@@ -14,7 +15,7 @@ export default function MessageBox({ token }) {
 
 	const messageElements = messages.map((message) => (
 		<p key={message.id}>
-			<span>{message.user}: </span>
+			<span>{message.username}: </span>
 			{message.text}
 		</p>
 	));

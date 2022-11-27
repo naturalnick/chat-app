@@ -13,7 +13,7 @@ export default function StatusBar({ token }) {
 	}, []);
 
 	const userElements = users.map((user) => (
-		<ListGroup.Item key={user.user_name}>{user.user_name}</ListGroup.Item>
+		<ListGroup.Item key={user.name}>{user.name}</ListGroup.Item>
 	));
 
 	return (

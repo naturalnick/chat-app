@@ -8,11 +8,16 @@
 
 h1 {
 	text-align: center;
-	margin-bottom: 30px;
+	margin-bottom: 20px;
 }
 
 .warning {
 	color: red;
+}
+
+.error {
+	color: red;
+	text-align: center;
 }
 
 .p-login {
