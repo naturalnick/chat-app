@@ -35,12 +35,12 @@ def get_messages():
 		records = cur.fetchall()
 	messages = []
 	for record in records:
-		msg_dict = dict(id = record[0], username = record[1], text = record[2], ate_created = record[3])
+		msg_dict = dict(id = record[0], username = record[1], text = record[2], date_created = record[3])
 		messages.append(msg_dict)
 	return messages
 
 def create_message(username, text):
 	date = datetime.now().strftime("%m/%d/%Y")
 	with conn.cursor() as cur:
-		cur.execute(f"INSERT INTO messages (text,date_created,username) VALUES('{username}','{text}','{date}')")
+		cur.execute(f"INSERT INTO messages (username,text,date_created) VALUES('{username}','{text}','{date}')")
 		conn.commit()
