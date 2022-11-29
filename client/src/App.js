@@ -19,13 +19,13 @@ export default function App() {
 	useEffect(() => {
 		socket.on("connected", () => {
 			console.log("client connected");
+			token.emit("logged_in", token);
 		});
-		socket.on("invalid", () => {
-			setToken(null);
-			localStorage.removeItem("authentication");
+		socket.on("request_denied", () => {
+			revokeAccess();
 		});
 		socket.on("disconnect", () => {
-			//do something?
+			token.emit("logged_out", token);
 		});
 		return () => {
 			socket.off("connect");
@@ -34,21 +34,10 @@ export default function App() {
 		};
 	}, []);
 
-	function sendMessage() {
-		fetch("http://127.0.0.1:5000/api/messages", {
-			method: "POST",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-				headers: { Authorization: `Bearer ${token}` },
-			},
-			body: JSON.stringify({ id: 78912 }),
-		})
-			.then((response) => response.json())
-			.then((response) => console.log(JSON.stringify(response)))
-			.catch((error) => {
-				console.log("Error: ", error);
-			});
+	function revokeAccess() {
+		setToken(null);
+		localStorage.removeItem("authentication");
+		//Display to user access denied?
 	}
 
 	return (
@@ -56,13 +45,13 @@ export default function App() {
 			{!token && <Navigate to="/login" replace={true} />}
 			<Container>
 				<Row>
-					<Col md={4}>
-						<StatusBar token={token} />
-					</Col>
-					<Col md={8}>
+					<Col md={9}>
 						<h2>Messages</h2>
 						<MessageBox token={token} />
 						<MessageBar token={token} />
+					</Col>
+					<Col md={3}>
+						<StatusBar token={token} />
 					</Col>
 				</Row>
 			</Container>

@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { SocketContext } from "../../context/socket";
 import ListGroup from "react-bootstrap/ListGroup";
+import Accordion from "react-bootstrap/Accordion";
 
 export default function StatusBar({ token }) {
 	const [users, setUsers] = useState([]);
@@ -17,9 +18,13 @@ export default function StatusBar({ token }) {
 	));
 
 	return (
-		<div className="status-bar">
-			<h2>Users</h2>
-			<ListGroup>{userElements}</ListGroup>
-		</div>
+		<Accordion defaultActiveKey="0">
+			<Accordion.Item eventKey="0">
+				<Accordion.Header>Users</Accordion.Header>
+				<Accordion.Body>
+					<ListGroup variant="flush">{userElements}</ListGroup>
+				</Accordion.Body>
+			</Accordion.Item>
+		</Accordion>
 	);
 }

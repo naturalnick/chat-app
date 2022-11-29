@@ -65,7 +65,7 @@ export default function Login() {
 						{...register("username", {
 							required: true,
 							minLength: 3,
-							maxLength: 40,
+							maxLength: 20,
 						})}
 					/>
 					{errors.username && (
@@ -82,6 +82,8 @@ export default function Login() {
 						placeholder="Password"
 						{...register("password", {
 							required: true,
+							minLength: 3,
+							maxLength: 4,
 							// pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/,
 						})}
 					/>

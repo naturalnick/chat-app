@@ -41,12 +41,14 @@ def send_users(token):
 	if check_jwt(token):
 		users = db_access.get_users()
 		emit("user_list", users)
+	else: emit("request_denied")
 
 @socketio.on("retrieve_messages")
 def send_messages(token):
-	if check_jwt(token):
+	if token and check_jwt(token):
 		msgs = db_access.get_messages()
-		emit("messages", msgs)
+		emit("messages", msgs, broadcast=True)
+	else: emit("request_denied")
 
 @socketio.on("message")
 def receive_message(message):
@@ -55,7 +57,9 @@ def receive_message(message):
 		username = payload["username"]
 		text = message["text"]
 		db_access.create_message(username, text)
-		print(db_access.get_messages())
+		msgs = db_access.get_messages()
+		emit("messages", msgs, broadcast=True)
+	else: emit("request_denied")
 
 @socketio.on("login_register")
 def handle_login(data):

@@ -4,19 +4,13 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-export default function SearchBar({ token }) {
+export default function MessageBar({ token }) {
 	const socket = useContext(SocketContext);
 	const [input, setInput] = useState("");
-	function handleChange(e) {
-		setInput(e.target.value);
-	}
 
 	function handleSubmit() {
-		// setMessages((prevMessages) => [
-		// 	...prevMessages,
-		// 	{ id: 345634634, user: "Nick", text: message },
-		// ]);
 		socket.emit("message", { text: input, token: token });
+		setInput("");
 	}
 	return (
 		<InputGroup className="">
@@ -25,7 +19,7 @@ export default function SearchBar({ token }) {
 				aria-label="Message"
 				aria-describedby="message"
 				value={input}
-				onChange={handleChange}
+				onChange={(e) => setInput(e.target.value)}
 			/>
 			<Button onClick={handleSubmit} variant="primary">
 				Send
