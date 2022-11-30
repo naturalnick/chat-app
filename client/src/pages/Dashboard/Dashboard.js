@@ -16,20 +16,19 @@ export default function Dashboard({ revokeAccess }) {
 	// const [isLogginIn, setIsLoggedIn] = useState(false);
 
 	useEffect(() => {
-		socket.on("connected", () => {
-			console.log("client connected");
-			token.emit("logged_in", token);
-		});
+		socket.emit("logged_in", token);
+
 		socket.on("request_denied", () => {
 			revokeAccess();
 		});
-		socket.on("disconnect", () => {
+
+		socket.on("disconnected", () => {
 			token.emit("logged_out", token);
 		});
+
 		return () => {
-			socket.off("connect");
+			socket.off("request_denied");
 			socket.off("disconnect");
-			socket.off("pong");
 		};
 	}, []);
 
