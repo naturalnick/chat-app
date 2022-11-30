@@ -1,12 +1,15 @@
 import { useState, useEffect, useContext, useRef } from "react";
-import { SocketContext } from "../../context/socket";
+import { SocketContext } from "../../context/Socket";
+import { TokenContext } from "../../context/Token";
 import Message from "../Message/Message";
 import "./MessageBox.css";
 
-export default function MessageBox({ token }) {
+export default function MessageBox() {
 	const [messages, setMessages] = useState([]);
 	const socket = useContext(SocketContext);
+	const token = useContext(TokenContext);
 	const anchorRef = useRef();
+
 	useEffect(() => {
 		socket.on("messages", (messages) => {
 			setMessages(messages);

@@ -1,13 +1,14 @@
 import { useEffect, useState, useContext } from "react";
-import { Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { SocketContext } from "../../context/socket";
+import { SocketContext } from "../../context/Socket";
+
 import Container from "react-bootstrap/esm/Container";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/esm/Button";
+
 import "./Login.css";
 
-export default function Login() {
+export default function Login({ authenticateUser }) {
 	const socket = useContext(SocketContext);
 	const [isRegistering, setIsRegistering] = useState(false);
 	const [error, setError] = useState("");
@@ -17,9 +18,6 @@ export default function Login() {
 		setValue,
 		formState: { errors },
 	} = useForm();
-	const [authenticated, setAuthenticated] = useState(() => {
-		return localStorage.getItem("authentication") ? true : false;
-	});
 
 	useEffect(() => {
 		setValue("type", isRegistering ? "register" : "login");
@@ -28,7 +26,7 @@ export default function Login() {
 	useEffect(() => {
 		socket.on("logged_in", (data) => {
 			localStorage.setItem("authentication", data.jwt);
-			setAuthenticated(true);
+			authenticateUser(data.jwt);
 		});
 		socket.on("invalid", () => {
 			setError(
@@ -47,13 +45,12 @@ export default function Login() {
 		};
 	}, []);
 
-	const onSignIn = (data) => {
-		socket.emit("login_register", data);
+	const onSignIn = (formData) => {
+		socket.emit("login_register", formData);
 	};
 
 	return (
 		<Container className="Login">
-			{authenticated && <Navigate to="/" replace={true} />}
 			<h1>{isRegistering ? "Register" : "Sign In"}</h1>
 			<p className="error">{error}</p>
 			<Form>
@@ -83,7 +80,7 @@ export default function Login() {
 						{...register("password", {
 							required: true,
 							minLength: 3,
-							maxLength: 4,
+							maxLength: 5,
 							// pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/,
 						})}
 					/>
