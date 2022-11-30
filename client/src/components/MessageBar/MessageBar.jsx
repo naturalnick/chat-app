@@ -1,11 +1,13 @@
 import { useState, useContext } from "react";
-import { SocketContext } from "../../context/socket";
+import { SocketContext } from "../../context/Socket";
+import { TokenContext } from "../../context/Token";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-export default function MessageBar({ token }) {
+export default function MessageBar() {
 	const socket = useContext(SocketContext);
+	const token = useContext(TokenContext);
 	const [input, setInput] = useState("");
 
 	function handleSubmit() {
