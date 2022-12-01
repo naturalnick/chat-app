@@ -1,0 +1,26 @@
+.user-list {
+	border: 1px solid lightgrey;
+}
+
+.list-title {
+	font-size: 20pt;
+	font-weight: bold;
+	margin-left: 10px;
+}
+
+.user-list-group {
+	max-height: 400px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	overflow-wrap: break-word;
+	border-top: 1px solid lightgrey;
+}
+
+.status-dot {
+	height: 10px;
+	width: 10px;
+	background-color: grey;
+	border-radius: 50%;
+	display: inline-block;
+	margin-right: 5px;
+}
