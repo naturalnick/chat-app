@@ -5,19 +5,19 @@ conn = psycopg2.connect("dbname=chat_app user=postgres host=localhost password=$
 
 def get_users():
 	with conn.cursor() as cur:
-		cur.execute("SELECT name FROM users ORDER BY name")
+		cur.execute("SELECT name, is_online FROM users ORDER BY is_online DESC, name ASC")
 		records = cur.fetchall()
 	users = []
 	for record in records:
-		user_dict = dict(name = record[0])
+		user_dict = dict(name = record[0], is_online = record[1])
 		users.append(user_dict)
 	return users
 
 def create_user(username, password):
 	date = datetime.now().strftime("%m/%d/%Y")
 	with conn.cursor() as cur:
-		cur.execute(f"INSERT INTO users (name, date_created, password) VALUES('{username}','{date}', crypt('{password}', gen_salt('bf')))")
-	conn.commit()
+		cur.execute(f"INSERT INTO users (name, date_created, password, is_online) VALUES('{username}','{date}', crypt('{password}', gen_salt('bf')), false)")
+		conn.commit()
 
 def get_user(username, password):
 	with conn.cursor() as cur:
@@ -43,4 +43,9 @@ def create_message(username, text):
 	date = datetime.now().strftime("%m/%d/%Y")
 	with conn.cursor() as cur:
 		cur.execute(f"INSERT INTO messages (username,text,date_created) VALUES('{username}','{text}','{date}')")
+		conn.commit()
+
+def update_online_status(username, isOnline):
+	with conn.cursor() as cur:
+		cur.execute(f"UPDATE users SET is_online = {isOnline} WHERE name = '{username}'")
 		conn.commit()

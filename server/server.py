@@ -2,7 +2,8 @@ from flask import Flask, request, render_template
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 import db_access
-from helpers import check_jwt, get_jwt_payload
+import jwt
+from helpers import check_jwt, get_jwt_payload, encode_for_sql
 
 app = Flask(__name__, static_folder="../client/build/static", template_folder="../client/build")
 app.config["SECRET_KEY"] = "secret"
@@ -24,13 +25,14 @@ def disconnected():
 
 @socketio.on("login_register")
 def handle_login(data):
+	print(data)
 	username = data["username"]
 	password = data['password']
 	userExists = db_access.check_user(username)
 	if userExists and data["type"] == "login" and db_access.get_user(username, password):
 		payload = {"username": username}
 		encoded_jwt = jwt.encode(payload, "secret", algorithm="HS256")
-		emit("athenticate", {"jwt": encoded_jwt}, broadcast=True)
+		emit("authenticate", {"jwt": encoded_jwt})
 	elif not userExists and data["type"] == "login":
 		emit("invalid")
 	elif userExists and data["type"] == "register":
@@ -43,8 +45,10 @@ def set_logged_in(token):
 	if check_jwt(token):
 		payload = get_jwt_payload(token)
 		username = payload["username"]
-		print(f"{username} has logged in")
-		#set user status to online
+		db_access.update_online_status(username, True)
+		users = db_access.get_users()
+		emit("user_list", users, broadcast=True)
+	else: emit("request_denied")
     
 @socketio.on("logged_out")
 def set_logged_in(token):
@@ -52,7 +56,7 @@ def set_logged_in(token):
 		payload = get_jwt_payload(token)
 		username = payload["username"]
 		print(f"{username} has logged out")
-		#set user status to offline
+		db_access.update_online_status(username, False)
 
 @socketio.on("retrieve_users")
 def send_users(token):
@@ -73,7 +77,7 @@ def receive_message(message):
 	if check_jwt(message["token"]):
 		payload = get_jwt_payload(message["token"])
 		username = payload["username"]
-		text = message["text"]
+		text = encode_for_sql(message["text"])
 		db_access.create_message(username, text)
 		msgs = db_access.get_messages()
 		emit("messages", msgs, broadcast=True)

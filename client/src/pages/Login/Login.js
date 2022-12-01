@@ -24,7 +24,7 @@ export default function Login({ authenticateUser }) {
 	}, [isRegistering]);
 
 	useEffect(() => {
-		socket.on("athenticate", (data) => {
+		socket.on("authenticate", (data) => {
 			localStorage.setItem("authentication", data.jwt);
 			authenticateUser(data.jwt);
 		});
