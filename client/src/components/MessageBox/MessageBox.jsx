@@ -2,12 +2,15 @@ import { useState, useEffect, useContext, useRef } from "react";
 import { SocketContext } from "../../context/Socket";
 import { TokenContext } from "../../context/Token";
 import Message from "../Message/Message";
+import MessageBar from "../MessageBar/MessageBar";
+
 import "./MessageBox.css";
 
 export default function MessageBox() {
-	const [messages, setMessages] = useState([]);
 	const socket = useContext(SocketContext);
 	const token = useContext(TokenContext);
+
+	const [messages, setMessages] = useState([]);
 	const anchorRef = useRef();
 
 	useEffect(() => {
@@ -25,9 +28,12 @@ export default function MessageBox() {
 		<Message message={message} />
 	));
 	return (
-		<div className="message-box">
-			{messageElements}
-			<div className="anchor" ref={anchorRef}></div>
-		</div>
+		<>
+			<div className="message-box">
+				{messageElements}
+				<div className="anchor" ref={anchorRef}></div>
+			</div>
+			<MessageBar />
+		</>
 	);
 }

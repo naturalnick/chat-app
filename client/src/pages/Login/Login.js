@@ -1,10 +1,10 @@
-import { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { SocketContext } from "../../context/Socket";
 
-import Container from "react-bootstrap/esm/Container";
+import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/esm/Button";
+import Button from "react-bootstrap/Button";
 
 import "./Login.css";
 
@@ -16,6 +16,7 @@ export default function Login({ authenticateUser }) {
 		register,
 		handleSubmit,
 		setValue,
+		setFocus,
 		formState: { errors },
 	} = useForm();
 
@@ -24,6 +25,8 @@ export default function Login({ authenticateUser }) {
 	}, [isRegistering]);
 
 	useEffect(() => {
+		setFocus("username", { shouldSelect: true });
+
 		socket.on("authenticate", (data) => {
 			localStorage.setItem("authentication", data.jwt);
 			authenticateUser(data.jwt);
@@ -39,7 +42,6 @@ export default function Login({ authenticateUser }) {
 			console.log("error");
 		});
 		return () => {
-			socket.off("logged_in");
 			socket.off("invalid");
 			socket.off("error");
 		};

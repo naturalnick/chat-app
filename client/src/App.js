@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { SocketContext, socket } from "./context/Socket";
 import { TokenContext } from "./context/Token";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -13,10 +13,10 @@ export default function App() {
 	function revokeAccess() {
 		setToken(null);
 		localStorage.removeItem("authentication");
-		//Display to user access denied?
 	}
 
 	function authenticateUser(usersToken) {
+		localStorage.setItem("authentication", usersToken);
 		setToken(usersToken);
 	}
 

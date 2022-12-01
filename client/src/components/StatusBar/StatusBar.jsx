@@ -1,34 +1,42 @@
-import { useEffect, useState, useContext } from "react";
-import { SocketContext } from "../../context/Socket";
+import { useContext, useState, useEffect } from "react";
 import { TokenContext } from "../../context/Token";
-import ListGroup from "react-bootstrap/ListGroup";
+import jwt_decode from "jwt-decode";
+
+import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+
 import "./StatusBar.css";
 
-export default function StatusBar() {
-	const [users, setUsers] = useState([]);
-	const socket = useContext(SocketContext);
+export default function StatusBar({ handleLogout }) {
 	const token = useContext(TokenContext);
+	const [name, setName] = useState("");
+
 	useEffect(() => {
-		socket.on("user_list", (users) => {
-			setUsers(users);
-		});
-		socket.emit("retrieve_users", token);
+		setName(getUsersName());
 	}, []);
 
-	const userElements = users.map((user) => (
-		<ListGroup.Item key={user.name}>
-			<span
-				className="status-dot"
-				style={{ backgroundColor: user.is_online ? "green" : "grey" }}
-			></span>
-			{user.name}
-		</ListGroup.Item>
-	));
-
+	function getUsersName() {
+		const payload = jwt_decode(token);
+		return payload.username;
+	}
 	return (
-		<div>
-			<h2>Users</h2>
-			<ListGroup>{userElements}</ListGroup>
-		</div>
+		<Navbar expand="md">
+			<Container fluid>
+				<h1>Chatroom</h1>
+				<Navbar.Toggle aria-controls="statusBar" />
+				<Navbar.Collapse className="justify-content-end">
+					<Nav>
+						<Navbar.Text className="user-status">
+							Logged in as: <span className="user">{name}</span>
+						</Navbar.Text>
+						<Button onClick={handleLogout} variant="outline-danger">
+							Logout
+						</Button>
+					</Nav>
+				</Navbar.Collapse>
+			</Container>
+		</Navbar>
 	);
 }

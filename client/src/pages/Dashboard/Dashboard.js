@@ -6,14 +6,13 @@ import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
-import MessageBar from "../../components/MessageBar/MessageBar";
-import StatusBar from "../../components/StatusBar/StatusBar";
+import UserList from "../../components/UserList/UserList";
 import MessageBox from "../../components/MessageBox/MessageBox";
+import StatusBar from "../../components/StatusBar/StatusBar";
 
 export default function Dashboard({ revokeAccess }) {
 	const socket = useContext(SocketContext);
 	const token = useContext(TokenContext);
-	// const [isLogginIn, setIsLoggedIn] = useState(false);
 
 	useEffect(() => {
 		socket.emit("logged_in", token);
@@ -22,26 +21,25 @@ export default function Dashboard({ revokeAccess }) {
 			revokeAccess();
 		});
 
-		socket.on("disconnected", () => {
-			token.emit("logged_out", token);
-		});
-
 		return () => {
 			socket.off("request_denied");
-			socket.off("disconnect");
 		};
 	}, []);
 
+	function handleLogout() {
+		socket.emit("logged_out");
+		revokeAccess();
+	}
+
 	return (
 		<Container>
+			<StatusBar handleLogout={handleLogout} />
 			<Row>
 				<Col md={9}>
-					<h2>Messages</h2>
-					<MessageBox token={token} />
-					<MessageBar token={token} />
+					<MessageBox />
 				</Col>
 				<Col md={3}>
-					<StatusBar token={token} />
+					<UserList />
 				</Col>
 			</Row>
 		</Container>
