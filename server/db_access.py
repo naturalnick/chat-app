@@ -16,18 +16,20 @@ def get_users():
 def create_user(username, password):
 	date = datetime.now().strftime("%m/%d/%Y")
 	with conn.cursor() as cur:
-		cur.execute(f"INSERT INTO users (name, date_created, password, is_online) VALUES('{username}','{date}', crypt('{password}', gen_salt('bf')), false)")
+		cur.execute(f"INSERT INTO users (name, date_created, password, is_online, session_id) VALUES('{username}','{date}', crypt('{password}', gen_salt('bf')), false)")
 		conn.commit()
 
-def get_user(username, password):
+def verify_user(username, password):
 	with conn.cursor() as cur:
 		cur.execute(f"SELECT * FROM users WHERE name = '{username}' AND password = crypt('{password}', password)")
-		return True if cur.fetchone() != None else False
+		record = cur.fetchone()
+		return False if record is None else True
 	
 def check_user(username):
 	with conn.cursor() as cur:
 		cur.execute(f"SELECT name FROM users WHERE name = '{username}'")
-		return True if cur.fetchone() != None else False
+		record = cur.fetchone()
+		return False if record is None else True
 
 def get_messages():
 	with conn.cursor() as cur:
@@ -45,7 +47,17 @@ def create_message(username, text):
 		cur.execute(f"INSERT INTO messages (username,text,date_created) VALUES('{username}','{text}','{date}')")
 		conn.commit()
 
-def update_online_status(username, isOnline):
+def set_user_status_online(username, session_id):
 	with conn.cursor() as cur:
-		cur.execute(f"UPDATE users SET is_online = {isOnline} WHERE name = '{username}'")
+		cur.execute(f"UPDATE users SET is_online = true WHERE name = '{username}'")
+		cur.execute(f"UPDATE users SET session_id = '{session_id}' WHERE name = '{username}'")
 		conn.commit()
+
+def set_user_status_offline(session_id):
+	with conn.cursor() as cur:
+		cur.execute(f"SELECT name FROM users WHERE session_id = '{session_id}'")
+		record = cur.fetchone()
+		if record is not None:
+			username = record[0]
+			cur.execute(f"UPDATE users SET is_online = false WHERE name = '{username}'")
+			conn.commit()
