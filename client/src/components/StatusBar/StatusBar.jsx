@@ -31,7 +31,11 @@ export default function StatusBar({ handleLogout }) {
 						<Navbar.Text className="user-status">
 							Logged in as: <span className="user">{name}</span>
 						</Navbar.Text>
-						<Button onClick={handleLogout} variant="outline-danger">
+						<Button
+							style={{ borderRadius: "0" }}
+							onClick={handleLogout}
+							variant="outline-danger"
+						>
 							Logout
 						</Button>
 					</Nav>

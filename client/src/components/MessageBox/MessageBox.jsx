@@ -28,12 +28,12 @@ export default function MessageBox() {
 		<Message message={message} />
 	));
 	return (
-		<>
+		<div>
 			<div className="message-box">
 				{messageElements}
 				<div className="anchor" ref={anchorRef}></div>
 			</div>
 			<MessageBar />
-		</>
+		</div>
 	);
 }

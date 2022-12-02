@@ -21,7 +21,7 @@ def create_user(username, password):
 
 def verify_user(username, password):
 	with conn.cursor() as cur:
-		cur.execute(f"SELECT * FROM users WHERE name = '{username}' AND password = crypt('{password}', password)")
+		cur.execute(f"SELECT name FROM users WHERE name = '{username}' AND password = crypt('{password}', password)")
 		record = cur.fetchone()
 		return False if record is None else True
 	
@@ -60,4 +60,5 @@ def set_user_status_offline(session_id):
 		if record is not None:
 			username = record[0]
 			cur.execute(f"UPDATE users SET is_online = false WHERE name = '{username}'")
+			cur.execute(f"UPDATE users SET session_id = null WHERE name = '{username}'")
 			conn.commit()

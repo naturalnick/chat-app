@@ -34,7 +34,7 @@ export default function Dashboard({ revokeAccess }) {
 	return (
 		<Container>
 			<StatusBar handleLogout={handleLogout} />
-			<Row>
+			<Row className="g-0">
 				<Col md={9}>
 					<MessageBox />
 				</Col>

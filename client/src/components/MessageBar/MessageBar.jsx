@@ -4,6 +4,7 @@ import { TokenContext } from "../../context/Token";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import "./MessageBar.css";
 
 export default function MessageBar() {
 	const socket = useContext(SocketContext);
@@ -15,15 +16,20 @@ export default function MessageBar() {
 		setInput("");
 	}
 	return (
-		<InputGroup className="">
+		<InputGroup>
 			<Form.Control
+				style={{ borderRadius: "0" }}
 				placeholder="Message"
 				aria-label="Message"
 				aria-describedby="message"
 				value={input}
 				onChange={(e) => setInput(e.target.value)}
 			/>
-			<Button onClick={handleSubmit} variant="primary">
+			<Button
+				style={{ borderRadius: "0" }}
+				onClick={handleSubmit}
+				variant="outline-primary"
+			>
 				Send
 			</Button>
 		</InputGroup>
