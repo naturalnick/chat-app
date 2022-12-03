@@ -18,7 +18,7 @@ export default function MessageBox() {
 			setMessages(messages);
 		});
 		socket.emit("retrieve_messages", token);
-	}, []);
+	}, [socket, token]);
 
 	useEffect(() => {
 		anchorRef.current.scrollIntoView();
@@ -32,8 +32,8 @@ export default function MessageBox() {
 			<div className="message-box">
 				{messageElements}
 				<div className="anchor" ref={anchorRef}></div>
+				<MessageBar />
 			</div>
-			<MessageBar />
 		</div>
 	);
 }

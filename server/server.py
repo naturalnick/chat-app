@@ -70,7 +70,6 @@ def send_messages(token):
 
 @socketio.on("message")
 def receive_message(message):
-	print(request.sid)
 	if check_jwt(message["token"]):
 		payload = get_jwt_payload(message["token"])
 		username = payload["username"]

@@ -16,22 +16,24 @@ export default function MessageBar() {
 		setInput("");
 	}
 	return (
-		<InputGroup>
-			<Form.Control
-				style={{ borderRadius: "0" }}
-				placeholder="Message"
-				aria-label="Message"
-				aria-describedby="message"
-				value={input}
-				onChange={(e) => setInput(e.target.value)}
-			/>
-			<Button
-				style={{ borderRadius: "0" }}
-				onClick={handleSubmit}
-				variant="outline-primary"
-			>
-				Send
-			</Button>
-		</InputGroup>
+		<div className="message-bar">
+			<InputGroup>
+				<Form.Control
+					style={{ borderRadius: "0" }}
+					placeholder="Message"
+					aria-label="Message"
+					aria-describedby="message"
+					value={input}
+					onChange={(e) => setInput(e.target.value)}
+				/>
+				<Button
+					style={{ borderRadius: "0" }}
+					onClick={handleSubmit}
+					variant="outline-primary"
+				>
+					Send
+				</Button>
+			</InputGroup>
+		</div>
 	);
 }

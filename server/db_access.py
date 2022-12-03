@@ -42,7 +42,8 @@ def get_messages():
 	return messages
 
 def create_message(username, text):
-	date = datetime.now().strftime("%m/%d/%Y")
+	date = datetime.now().strftime("%m/%d/%y %H:%M %Z")
+	print(date)
 	with conn.cursor() as cur:
 		cur.execute(f"INSERT INTO messages (username,text,date_created) VALUES('{username}','{text}','{date}')")
 		conn.commit()
