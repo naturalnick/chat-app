@@ -10,11 +10,6 @@ export default function App() {
 		return localStorage.getItem("authentication");
 	});
 
-	function revokeAccess() {
-		setToken(null);
-		localStorage.removeItem("authentication");
-	}
-
 	function authenticateUser(usersToken) {
 		localStorage.setItem("authentication", usersToken);
 		setToken(usersToken);
@@ -25,7 +20,7 @@ export default function App() {
 			<TokenContext.Provider value={token}>
 				<div className="App">
 					{token ? (
-						<Dashboard revokeAccess={revokeAccess} />
+						<Dashboard setToken={setToken} />
 					) : (
 						<Login authenticateUser={authenticateUser} />
 					)}

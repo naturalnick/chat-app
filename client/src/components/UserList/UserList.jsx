@@ -15,7 +15,7 @@ export default function StatusBar() {
 		return () => {
 			socket.off("user_list");
 		};
-	}, []);
+	}, [socket]);
 
 	const userElements = users.map((user) => (
 		<ListGroup.Item key={user.name}>
@@ -28,11 +28,9 @@ export default function StatusBar() {
 	));
 
 	return (
-		<div className="user-list">
+		<ListGroup variant="flush" className="user-list">
 			<div className="list-title">Users</div>
-			<ListGroup variant="flush" className="user-list-group">
-				{userElements}
-			</ListGroup>
-		</div>
+			{userElements}
+		</ListGroup>
 	);
 }

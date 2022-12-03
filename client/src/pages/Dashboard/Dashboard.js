@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { TokenContext } from "../../context/Token";
 import { SocketContext } from "../../context/Socket";
 
@@ -10,30 +10,31 @@ import UserList from "../../components/UserList/UserList";
 import MessageBox from "../../components/MessageBox/MessageBox";
 import StatusBar from "../../components/StatusBar/StatusBar";
 
-export default function Dashboard({ revokeAccess }) {
+export default function Dashboard({ setToken }) {
 	const socket = useContext(SocketContext);
 	const token = useContext(TokenContext);
+
+	const logout = useCallback(() => {
+		setToken(null);
+		localStorage.removeItem("authentication");
+		socket.emit("logged_out");
+	}, [setToken, socket]);
 
 	useEffect(() => {
 		socket.emit("logged_in", token);
 
 		socket.on("request_denied", () => {
-			revokeAccess();
+			logout();
 		});
 
 		return () => {
 			socket.off("request_denied");
 		};
-	}, []);
-
-	function handleLogout() {
-		socket.emit("logged_out");
-		revokeAccess();
-	}
+	}, [logout, socket, token]);
 
 	return (
 		<Container>
-			<StatusBar handleLogout={handleLogout} />
+			<StatusBar logout={logout} />
 			<Row className="g-0">
 				<Col md={9}>
 					<MessageBox />

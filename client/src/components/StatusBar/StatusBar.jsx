@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useMemo } from "react";
 import { TokenContext } from "../../context/Token";
 import jwt_decode from "jwt-decode";
 
@@ -9,18 +9,16 @@ import Nav from "react-bootstrap/Nav";
 
 import "./StatusBar.css";
 
-export default function StatusBar({ handleLogout }) {
+export default function StatusBar({ logout }) {
 	const token = useContext(TokenContext);
 	const [name, setName] = useState("");
 
-	useEffect(() => {
-		setName(getUsersName());
-	}, []);
+	const getUsersName = useMemo(() => jwt_decode(token).username, [token]);
 
-	function getUsersName() {
-		const payload = jwt_decode(token);
-		return payload.username;
-	}
+	useEffect(() => {
+		setName(getUsersName);
+	}, [getUsersName]);
+
 	return (
 		<Navbar expand="md">
 			<Container fluid>
@@ -33,7 +31,7 @@ export default function StatusBar({ handleLogout }) {
 						</Navbar.Text>
 						<Button
 							style={{ borderRadius: "0" }}
-							onClick={handleLogout}
+							onClick={logout}
 							variant="outline-danger"
 						>
 							Logout
