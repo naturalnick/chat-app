@@ -27,7 +27,7 @@ def verify_user(username, password):
 		record = cur.fetchone()
 		return False if record is None else True
 	
-def check_user(username):
+def check_user_exists(username):
 	with conn.cursor() as cur:
 		cur.execute(f"SELECT name FROM users WHERE name = '{username}'")
 		record = cur.fetchone()

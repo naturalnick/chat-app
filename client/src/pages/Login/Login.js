@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useContext, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { SocketContext } from "../../context/Socket";
 
 import Stack from "react-bootstrap/Stack";
 import Form from "react-bootstrap/Form";
@@ -9,7 +8,6 @@ import Button from "react-bootstrap/Button";
 import "./Login.css";
 
 export default function Login({ setToken }) {
-	const socket = useContext(SocketContext);
 	const [isRegistering, setIsRegistering] = useState(false);
 	const [error, setError] = useState("");
 	const {
@@ -24,35 +22,38 @@ export default function Login({ setToken }) {
 		setValue("type", isRegistering ? "register" : "login");
 	}, [isRegistering, setValue]);
 
+	useEffect(() => {
+		setFocus("username", { shouldSelect: true });
+	}, [setFocus]);
+
 	const determineError = useMemo(() => {
 		return isRegistering
 			? "Username already exists."
 			: "Username or password is incorrect.";
 	}, [isRegistering]);
 
-	useEffect(() => {
-		function authenticateUser(usersToken) {
-			localStorage.setItem("authentication", usersToken);
-			setToken(usersToken);
-		}
-
-		setFocus("username", { shouldSelect: true });
-
-		socket.on("authenticate", (data) => {
-			localStorage.setItem("authentication", data.jwt);
-			authenticateUser(data.jwt);
-		});
-		socket.on("invalid", () => {
-			setError(determineError);
-		});
-		return () => {
-			socket.off("invalid");
-		};
-	}, [socket, setFocus, setToken, determineError]);
-
-	const onSignIn = (formData) => {
-		socket.emit("login_register", formData);
+	const onSubmit = async (formData) => {
+		const formType = isRegistering ? "register" : "login";
+		const response = await fetch(
+			`http://127.0.0.1:5000/api/auth/${formType}`,
+			{
+				method: "POST",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(formData),
+			}
+		);
+		const data = await response.json();
+		//check for failure
+		authenticateUser(data.token);
 	};
+
+	function authenticateUser(usersToken) {
+		localStorage.setItem("authentication", usersToken);
+		setToken(usersToken);
+	}
 
 	function displayForm() {
 		return (
@@ -94,7 +95,7 @@ export default function Login({ setToken }) {
 					)}
 				</Form.Group>
 				<div className="d-grid">
-					<Button onClick={handleSubmit(onSignIn)} name="submit">
+					<Button onClick={handleSubmit(onSubmit)} name="submit">
 						{isRegistering ? "Sign Up" : "Sign In"}
 					</Button>
 				</div>
