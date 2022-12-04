@@ -23,5 +23,4 @@ yarn-debug.log*
 yarn-error.log*
 
 #testing
-/test
-Login.test.js
+jest.config.js

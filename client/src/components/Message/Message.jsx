@@ -3,18 +3,17 @@ import "./Message.css";
 
 export default function Message({ message }) {
 	const [timeShown, setTimeShown] = useState(false);
-	const messageDate = message.date_created.split(" ");
+	const messageDate = formatDate(message.date_created).split(", ");
 
-	function changeTimeZone(date) {
-		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-		return new Date(
-			new Date(date).toLocaleString("en-US", {
-				timeZone,
-			})
-		);
+	function formatDate(date) {
+		const newDate = new Date(date); //auto sets times to local timezone
+		return newDate.toLocaleString("en-US", {
+			hour12: "true",
+			dateStyle: "short",
+			timeStyle: "short",
+		});
 	}
 
-	//console.log(message.date_created);
 	return (
 		<div key={message.id} className="message">
 			<span
