@@ -18,6 +18,16 @@ export default function Login({ setToken }) {
 		formState: { errors },
 	} = useForm();
 
+	const determineError = useMemo(() => {
+		return isRegistering
+			? "Username already exists."
+			: "Username or password is incorrect.";
+	}, [isRegistering]);
+
+	useEffect(() => {
+		setError(determineError);
+	}, [setError, determineError]);
+
 	useEffect(() => {
 		setValue("type", isRegistering ? "register" : "login");
 	}, [isRegistering, setValue]);
@@ -25,12 +35,6 @@ export default function Login({ setToken }) {
 	useEffect(() => {
 		setFocus("username", { shouldSelect: true });
 	}, [setFocus]);
-
-	const determineError = useMemo(() => {
-		return isRegistering
-			? "Username already exists."
-			: "Username or password is incorrect.";
-	}, [isRegistering]);
 
 	const onSubmit = async (formData) => {
 		const formType = isRegistering ? "register" : "login";
@@ -120,7 +124,7 @@ export default function Login({ setToken }) {
 	return (
 		<div className="Login">
 			<Stack gap={2} className="mx-auto">
-				<h2>Chatroom</h2>
+				<h2>Burble</h2>
 				<h1>{isRegistering ? "Register" : "Sign In"}</h1>
 				<div className="error">{error}</div>
 				{displayForm()}
