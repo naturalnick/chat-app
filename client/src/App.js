@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { SocketContext, socket } from "./context/Socket";
 import { TokenContext } from "./context/Token";
+import { SocketContext, socket } from "./context/Socket";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Login from "./pages/Login/Login";
 import "./App.css";
@@ -11,16 +11,16 @@ export default function App() {
 	});
 
 	return (
-		<SocketContext.Provider value={socket}>
-			<TokenContext.Provider value={token}>
-				<div className="App">
-					{token ? (
+		<TokenContext.Provider value={token}>
+			<div className="App">
+				{token ? (
+					<SocketContext.Provider value={socket}>
 						<Dashboard setToken={setToken} />
-					) : (
-						<Login setToken={setToken} />
-					)}
-				</div>
-			</TokenContext.Provider>
-		</SocketContext.Provider>
+					</SocketContext.Provider>
+				) : (
+					<Login setToken={setToken} />
+				)}
+			</div>
+		</TokenContext.Provider>
 	);
 }
