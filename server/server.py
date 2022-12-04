@@ -3,16 +3,20 @@ from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 import db_access
 import jwt
-from helpers import check_jwt, get_jwt_payload, encode_for_sql
+from helpers import check_jwt, get_jwt_payload, escape_for_sql
 
-app = Flask(__name__, static_folder="../client/build/static", template_folder="../client/build")
+app = Flask(__name__, static_folder="../client/build", static_url_path="")
 app.config["SECRET_KEY"] = "secret"
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*") #change * to url of client
 
 @app.route("/")
 def index():
-   return render_template("index.html"), 200
+   return app.send_static_file("index.html"), 200
+
+@app.errorhandler(404)
+def not_found(e):
+	return app.send_static_file("index.html")
 
 @socketio.on("connect")
 def client_connect():
@@ -28,17 +32,15 @@ def handle_login(data):
 	username = data["username"]
 	password = data['password']
 	userExists = db_access.check_user(username)
-	if userExists and data["type"] == "login" and db_access.verify_user(username, password):
-		authenticate_user(username)
-	elif not userExists and data["type"] == "login":
-		emit("invalid")
-	elif userExists and data["type"] == "register":
-		emit("invalid")
+	if userExists and data["type"] == "login":
+		send_authorization(username) if db_access.verify_user(username, password) else emit("invalid")
 	elif not userExists and data["type"] == "register":
 		db_access.create_user(username, password)
-		authenticate_user(username)
+		send_authorization(username)
+	else:
+		emit("invalid")
 
-def authenticate_user(username):
+def send_authorization(username):
 	payload = {"username": username}
 	encoded_jwt = jwt.encode(payload, "secret", algorithm="HS256")
 	emit("authenticate", {"jwt": encoded_jwt})
@@ -65,7 +67,7 @@ def update_users():
 def send_messages(token):
 	if token and check_jwt(token):
 		msgs = db_access.get_messages()
-		emit("messages", msgs, broadcast=True)
+		emit("messages", msgs)
 	else: emit("request_denied")
 
 @socketio.on("message")
@@ -73,15 +75,11 @@ def receive_message(message):
 	if check_jwt(message["token"]):
 		payload = get_jwt_payload(message["token"])
 		username = payload["username"]
-		text = encode_for_sql(message["text"])
+		text = escape_for_sql(message["text"])
 		db_access.create_message(username, text)
 		msgs = db_access.get_messages()
 		emit("messages", msgs, broadcast=True)
 	else: emit("request_denied")
-
-@app.errorhandler(404)
-def not_found(e):
-	return app.send_static_file("index.html")
 
 if __name__=="__main__":
 	socketio.run(app,debug=True)

@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { SocketContext } from "../../context/Socket";
 
-import Container from "react-bootstrap/Container";
+import Stack from "react-bootstrap/Stack";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
 import "./Login.css";
 
-export default function Login({ authenticateUser }) {
+export default function Login({ setToken }) {
 	const socket = useContext(SocketContext);
 	const [isRegistering, setIsRegistering] = useState(false);
 	const [error, setError] = useState("");
@@ -22,9 +22,20 @@ export default function Login({ authenticateUser }) {
 
 	useEffect(() => {
 		setValue("type", isRegistering ? "register" : "login");
+	}, [isRegistering, setValue]);
+
+	const determineError = useMemo(() => {
+		return isRegistering
+			? "Username already exists."
+			: "Username or password is incorrect.";
 	}, [isRegistering]);
 
 	useEffect(() => {
+		function authenticateUser(usersToken) {
+			localStorage.setItem("authentication", usersToken);
+			setToken(usersToken);
+		}
+
 		setFocus("username", { shouldSelect: true });
 
 		socket.on("authenticate", (data) => {
@@ -32,29 +43,19 @@ export default function Login({ authenticateUser }) {
 			authenticateUser(data.jwt);
 		});
 		socket.on("invalid", () => {
-			setError(
-				isRegistering
-					? "Username already exists."
-					: "Username or password is incorrect."
-			);
-		});
-		socket.on("error", () => {
-			console.log("error");
+			setError(determineError);
 		});
 		return () => {
 			socket.off("invalid");
-			socket.off("error");
 		};
-	}, []);
+	}, [socket, setFocus, setToken, determineError]);
 
 	const onSignIn = (formData) => {
 		socket.emit("login_register", formData);
 	};
 
-	return (
-		<Container className="Login">
-			<h1>{isRegistering ? "Register" : "Sign In"}</h1>
-			<p className="error">{error}</p>
+	function displayForm() {
+		return (
 			<Form>
 				<Form.Group className="mb-3">
 					<Form.Label>Username</Form.Label>
@@ -66,38 +67,43 @@ export default function Login({ authenticateUser }) {
 							minLength: 3,
 							maxLength: 20,
 						})}
+						role="username-input"
 					/>
-					{errors.username && (
-						<Form.Text className="warning">
-							Username is required and must be between 4-40 alpha-numeric
-							characters.
+					{errors.username && isRegistering && (
+						<Form.Text className="error">
+							A username between 4-20 characters is required.
 						</Form.Text>
 					)}
 				</Form.Group>
 				<Form.Group className="mb-3">
-					<Form.Label>Password</Form.Label>
+					<Form.Label>Password (four letters or numbers)</Form.Label>
 					<Form.Control
 						type="password"
 						placeholder="Password"
 						{...register("password", {
 							required: true,
-							minLength: 3,
-							maxLength: 5,
+							minLength: 4,
+							maxLength: 20,
 							// pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/,
 						})}
 					/>
-					{errors.password && (
-						<Form.Text className="warning">Password not valid.</Form.Text>
+					{errors.password && isRegistering && (
+						<Form.Text className="error">
+							A four character password is required.
+						</Form.Text>
 					)}
 				</Form.Group>
-				<Button onClick={handleSubmit(onSignIn)}>
-					{isRegistering ? "Sign Up" : "Sign In"}
-				</Button>
-				<p className="p-login">
+				<div className="d-grid">
+					<Button onClick={handleSubmit(onSignIn)} name="submit">
+						{isRegistering ? "Sign Up" : "Sign In"}
+					</Button>
+				</div>
+				<div className="member">
 					{isRegistering ? "Already a member? " : "Not a member? "}
 					<span
 						className="switch-login"
 						onClick={() => {
+							setError("");
 							setIsRegistering(
 								(prevIsRegistering) => !prevIsRegistering
 							);
@@ -105,8 +111,19 @@ export default function Login({ authenticateUser }) {
 					>
 						{isRegistering ? "Sign In" : "Register"}
 					</span>
-				</p>
+				</div>
 			</Form>
-		</Container>
+		);
+	}
+
+	return (
+		<div className="Login">
+			<Stack gap={2} className="mx-auto">
+				<h2>Chatroom</h2>
+				<h1>{isRegistering ? "Register" : "Sign In"}</h1>
+				<div className="error">{error}</div>
+				{displayForm()}
+			</Stack>
+		</div>
 	);
 }

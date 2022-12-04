@@ -10,11 +10,6 @@ export default function App() {
 		return localStorage.getItem("authentication");
 	});
 
-	function authenticateUser(usersToken) {
-		localStorage.setItem("authentication", usersToken);
-		setToken(usersToken);
-	}
-
 	return (
 		<SocketContext.Provider value={socket}>
 			<TokenContext.Provider value={token}>
@@ -22,7 +17,7 @@ export default function App() {
 					{token ? (
 						<Dashboard setToken={setToken} />
 					) : (
-						<Login authenticateUser={authenticateUser} />
+						<Login setToken={setToken} />
 					)}
 				</div>
 			</TokenContext.Provider>

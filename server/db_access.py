@@ -1,5 +1,7 @@
 import psycopg2
 from datetime import datetime
+import pytz
+from helpers import remove_sql_escapes
 
 conn = psycopg2.connect("dbname=chat_app user=postgres host=localhost password=$CH&&fer")
 
@@ -37,12 +39,12 @@ def get_messages():
 		records = cur.fetchall()
 	messages = []
 	for record in records:
-		msg_dict = dict(id = record[0], username = record[1], text = record[2], date_created = record[3])
+		msg_dict = dict(id = record[0], username = record[1], text = remove_sql_escapes(record[2]), date_created = record[3])
 		messages.append(msg_dict)
 	return messages
 
 def create_message(username, text):
-	date = datetime.now().strftime("%m/%d/%y %H:%M %Z")
+	date = datetime.now().astimezone(pytz.utc)
 	print(date)
 	with conn.cursor() as cur:
 		cur.execute(f"INSERT INTO messages (username,text,date_created) VALUES('{username}','{text}','{date}')")
