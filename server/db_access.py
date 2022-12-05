@@ -45,7 +45,6 @@ def get_messages():
 
 def create_message(username, text):
 	date = datetime.now().astimezone(pytz.utc)
-	print(date)
 	with conn.cursor() as cur:
 		cur.execute(f"INSERT INTO messages (username,text,date_created) VALUES('{username}','{text}','{date}')")
 		conn.commit()
