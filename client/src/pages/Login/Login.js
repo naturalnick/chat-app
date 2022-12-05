@@ -13,7 +13,6 @@ export default function Login({ setToken }) {
 	const {
 		register,
 		handleSubmit,
-		setValue,
 		setFocus,
 		formState: { errors },
 	} = useForm();
@@ -27,10 +26,6 @@ export default function Login({ setToken }) {
 	useEffect(() => {
 		setError(determineError);
 	}, [setError, determineError]);
-
-	useEffect(() => {
-		setValue("type", isRegistering ? "register" : "login");
-	}, [isRegistering, setValue]);
 
 	useEffect(() => {
 		setFocus("username", { shouldSelect: true });
