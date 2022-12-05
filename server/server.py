@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from db_access import verify_user, create_user, set_user_status_online, set_user_status_offline, get_users, get_messages, check_user_exists, create_message
@@ -18,17 +18,17 @@ def login():
 	username = request.json["username"]
 	password = request.json['password']
 	if check_user_exists(username) is False:
-		return {"Error": "Username doesn't exist."}, 403
+		return "Username doesn't exist.", 403
 	if verify_user(username, password):
-		return {"token": getToken(username)}, 200
-	else: return {"Error": "Username or password is incorrect."}, 404
+		return jsonify({"token": getToken(username)}), 200
+	else: return {"error": "Username or password is incorrect."}, 401
 
 @app.route("/api/auth/register", methods=['POST'])
 def register():
 	username = request.json["username"]
 	password = request.json['password']
 	if check_user_exists(username):
-		return {"Error": "User already exists"}, 403
+		return {"error": "User already exists"}, 403
 	else:
 		create_user(username, password)
 		return {"token": getToken(username)}, 200
@@ -36,6 +36,10 @@ def register():
 @app.errorhandler(404)
 def not_found(e):
 	return app.send_static_file("index.html")
+
+@socketio.on("ping")
+def connected():
+	emit("pong")
 
 @socketio.on("disconnect")
 def disconnected():

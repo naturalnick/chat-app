@@ -24,10 +24,6 @@ export default function Login({ setToken }) {
 	}, [isRegistering]);
 
 	useEffect(() => {
-		setError(determineError);
-	}, [setError, determineError]);
-
-	useEffect(() => {
 		setFocus("username", { shouldSelect: true });
 	}, [setFocus]);
 
@@ -44,9 +40,13 @@ export default function Login({ setToken }) {
 				body: JSON.stringify(formData),
 			}
 		);
-		const data = await response.json();
-		//check for failure
-		authenticateUser(data.token);
+		const status = response.status;
+		if (status === 200) {
+			const data = await response.json();
+			authenticateUser(data.token);
+		} else if (status === 403) {
+			setError(determineError);
+		}
 	};
 
 	function authenticateUser(usersToken) {

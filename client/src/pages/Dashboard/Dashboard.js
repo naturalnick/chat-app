@@ -15,8 +15,8 @@ export default function Dashboard({ setToken }) {
 	const token = useContext(TokenContext);
 
 	const logout = useCallback(() => {
-		setToken(null);
 		localStorage.removeItem("authentication");
+		setToken(null);
 		socket.emit("logged_out");
 	}, [setToken, socket]);
 
