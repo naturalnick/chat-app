@@ -3,7 +3,7 @@ from datetime import datetime
 import pytz
 from helpers import remove_sql_escapes
 
-conn = psycopg2.connect("dbname=chat_app user=postgres host=localhost password=$CH&&fer")
+conn = psycopg2.connect("dbname=chat_app user=postgres host=localhost password=password")
 
 def get_users():
 	with conn.cursor() as cur:

@@ -17,18 +17,21 @@ def index():
 def login():
 	username = request.json["username"]
 	password = request.json['password']
+	if check_user_exists(username) is False:
+		return {"Error": "Username doesn't exist."}, 403
 	if verify_user(username, password):
 		return {"token": getToken(username)}, 200
-	else: return {None}, 404
+	else: return {"Error": "Username or password is incorrect."}, 404
 
 @app.route("/api/auth/register", methods=['POST'])
 def register():
 	username = request.json["username"]
 	password = request.json['password']
 	if check_user_exists(username):
-		return {None}, 403
-	create_user(username, password)
-	return {"token": getToken(username)}, 200
+		return {"Error": "User already exists"}, 403
+	else:
+		create_user(username, password)
+		return {"token": getToken(username)}, 200
 
 @app.errorhandler(404)
 def not_found(e):
@@ -70,6 +73,10 @@ def receive_message(message):
 		msgs = get_messages()
 		emit("messages", msgs, broadcast=True)
 	else: emit("request_denied")
+
+@socketio.on("test")
+def test_relay():
+	emit("success")
 
 def update_users():
 	users = get_users()
