@@ -22,7 +22,7 @@ export default function StatusBar({ logout }) {
 	return (
 		<Navbar expand="md">
 			<Container fluid>
-				<h1>Burble</h1>
+				<h1 className="dashboard-title">Burble</h1>
 				<Navbar.Toggle aria-controls="statusBar" />
 				<Navbar.Collapse className="justify-content-end">
 					<Nav>

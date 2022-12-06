@@ -1,7 +1,7 @@
 import psycopg2
 from datetime import datetime
 import pytz
-from helpers import remove_sql_escapes
+from helpers import remove_sql_escapes, escape_for_sql
 from config.config import config
 params = config(config_db = "database.ini")
 
@@ -17,11 +17,13 @@ def get_users():
 		users.append(user_dict)
 	return users
 
+
 def create_user(username, password):
 	date = datetime.now().strftime("%m/%d/%Y")
 	with conn.cursor() as cur:
 		cur.execute(f"INSERT INTO users (name, date_created, password, is_online) VALUES('{username}','{date}', crypt('{password}', gen_salt('bf')), false)")
 		conn.commit()
+
 
 def verify_user(username, password):
 	with conn.cursor() as cur:
@@ -29,17 +31,20 @@ def verify_user(username, password):
 		record = cur.fetchone()
 		return False if record is None else True
 	
+
 def check_user_online(username):
 	with conn.cursor() as cur:
 		cur.execute(f"SELECT name FROM users WHERE name = '{username}' AND is_online = true")
 		record = cur.fetchone()
 		return False if record is None else True
 
+
 def check_user_exists(username):
 	with conn.cursor() as cur:
 		cur.execute(f"SELECT name FROM users WHERE name = '{username}'")
 		record = cur.fetchone()
 		return False if record is None else True
+
 
 def get_messages():
 	with conn.cursor() as cur:
@@ -51,17 +56,21 @@ def get_messages():
 		messages.append(msg_dict)
 	return messages
 
+
 def create_message(username, text):
 	date = datetime.now().astimezone(pytz.utc)
+	sql_safe_text = escape_for_sql(text)
 	with conn.cursor() as cur:
-		cur.execute(f"INSERT INTO messages (username,text,date_created) VALUES('{username}','{text}','{date}')")
+		cur.execute(f"INSERT INTO messages (username,text,date_created) VALUES('{username}','{sql_safe_text}','{date}')")
 		conn.commit()
+
 
 def set_user_status_online(username, session_id):
 	with conn.cursor() as cur:
 		cur.execute(f"UPDATE users SET is_online = true WHERE name = '{username}'")
 		cur.execute(f"UPDATE users SET session_id = '{session_id}' WHERE name = '{username}'")
 		conn.commit()
+
 
 def set_user_status_offline(session_id):
 	with conn.cursor() as cur:
@@ -72,3 +81,9 @@ def set_user_status_offline(session_id):
 			cur.execute(f"UPDATE users SET is_online = false WHERE name = '{username}'")
 			cur.execute(f"UPDATE users SET session_id = null WHERE name = '{username}'")
 			conn.commit()
+
+
+def set_all_users_offline():
+	with conn.cursor() as cur:
+		cur.execute(f"UPDATE users SET is_online = false")
+		conn.commit()

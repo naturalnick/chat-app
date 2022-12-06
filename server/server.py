@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
-from db_access import verify_user, create_user, set_user_status_online, set_user_status_offline, get_users, get_messages, check_user_exists, create_message, check_user_online
-from helpers import check_jwt, get_jwt_payload, escape_for_sql, getToken
+import db_access as db
+from helpers import check_jwt, get_jwt_payload, getToken
 
 app = Flask(__name__, static_folder="../client/build", static_url_path="")
 app.config["SECRET_KEY"] = "secret"
@@ -13,80 +13,84 @@ socketio = SocketIO(app, cors_allowed_origins="*") #change * to url of client
 def index():
    return app.send_static_file("index.html"), 200
 
-@app.route("/api/auth/login", methods=["POST"])
-def login():
-	username = request.json["username"]
-	password = request.json["password"]
-	if check_user_exists(username) is False:
-		return "Username doesn't exist.", 403
-	if check_user_online(username) is False:
-		return "User is already logged in.", 403
-	if verify_user(username, password):
-		return jsonify({"token": getToken(username)}), 200
-	else: return {"error": "Username or password is incorrect."}, 401
-
-@app.route("/api/auth/register", methods=["POST"])
-def register():
-	username = request.json["username"]
-	password = request.json["password"]
-	if check_user_exists(username):
-		return {"error": "User already exists"}, 403
-	else:
-		create_user(username, password)
-		return {"token": getToken(username)}, 200
 
 @app.errorhandler(404)
 def not_found(e):
 	return app.send_static_file("index.html")
 
-@socketio.on("ping")
-def connected():
-	emit("pong")
+
+@app.route("/api/auth/login", methods=["POST"])
+def login():
+	username = request.json["username"]
+	password = request.json["password"]
+	if db.check_user_exists(username) is False:
+		return "Username doesn't exist.", 404
+	if db.check_user_online(username) is True:
+		return "User is already logged in.", 403
+	if db.verify_user(username, password):
+		return jsonify({"token": getToken(username)}), 200
+	else: return "Username or password is incorrect.", 401
+
+
+@app.route("/api/auth/register", methods=["POST"])
+def register():
+	username = request.json["username"]
+	password = request.json["password"]
+	if db.check_user_exists(username):
+		return "Username is already taken.", 403
+	else:
+		db.create_user(username, password)
+		return {"token": getToken(username)}, 200
+
 
 @socketio.on("disconnect")
 def disconnected():
-	set_user_status_offline(request.sid)
+	db.set_user_status_offline(request.sid)
 	update_users()
+
 
 @socketio.on("logged_in")
 def set_logged_in(token):
 	if check_jwt(token):
 		payload = get_jwt_payload(token)
-		username = payload["username"]
-		set_user_status_online(username, request.sid)
+		db.set_user_status_online(payload["username"], request.sid)
 		update_users()
 	else: emit("request_denied")
     
+
 @socketio.on("logged_out")
 def set_logged_out():
-	set_user_status_offline(request.sid)
+	db.set_user_status_offline(request.sid)
 	update_users()
+
 
 @socketio.on("retrieve_messages")
 def send_messages(token):
 	if token and check_jwt(token):
-		msgs = get_messages()
+		msgs = db.get_messages()
 		emit("messages", msgs)
 	else: emit("request_denied")
+
 
 @socketio.on("message")
 def receive_message(message):
 	if check_jwt(message["token"]):
 		payload = get_jwt_payload(message["token"])
-		username = payload["username"]
-		text = escape_for_sql(message["text"])
-		create_message(username, text)
-		msgs = get_messages()
-		emit("messages", msgs, broadcast=True)
+		db.create_message(payload["username"], message["text"])
+		emit("messages", db.get_messages(), broadcast=True)
 	else: emit("request_denied")
+
 
 @socketio.on("test")
 def test_relay():
 	emit("success")
 
+
 def update_users():
-	users = get_users()
+	users = db.get_users()
 	emit("user_list", users, broadcast=True)
 
+
 if __name__=="__main__":
+	db.set_all_users_offline() # fail-safe if server crashes - always start with all users offline
 	socketio.run(app,debug=True)

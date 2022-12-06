@@ -11,7 +11,7 @@ class ServerTest(unittest.TestCase):
 		self.test_client = app.test_client(self)
 		self.socketio_test_client = socketio.test_client(self.test_client)
 
-		socketio.emit("ping")
+		socketio.emit("test")
 		
 
 	def test_index_status(self):
@@ -36,8 +36,7 @@ class ServerTest(unittest.TestCase):
 		response = self.test_client.post("/api/auth/login", content_type="application/json", data=json.dumps(payload))
 		
 		self.assertEqual(response.status_code, 401)
-		self.assertEqual(response.content_type, "application/json")
-		self.assertTrue("error" in response.json)
+		self.assertEqual(response.content_type, "text/html; charset=utf-8")
 
 
 	def test_register_with_existing_credentials(self):
@@ -46,8 +45,7 @@ class ServerTest(unittest.TestCase):
 		status_code = response.status_code
 
 		self.assertEqual(status_code, 403)
-		self.assertEqual(response.content_type, "application/json")
-		self.assertTrue("error" in response.json)
+		self.assertEqual(response.content_type, "text/html; charset=utf-8")
 
 
 	def test_socket_connection(self):
@@ -56,11 +54,12 @@ class ServerTest(unittest.TestCase):
 
 	def test_received_ping(self):
 		response = self.socketio_test_client.get_received()
-		self.assertEqual(response[0].get("name"), "ping")
+		self.assertEqual(response[0].get("name"), "test")
 
 
 	def tearDown(self) -> None:
 		return super().tearDown()
+
 
 if __name__=="__main__":
 	unittest.main()
