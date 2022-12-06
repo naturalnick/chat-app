@@ -32,7 +32,9 @@ export default function MessageBox() {
 			<div className="message-box">
 				{messageElements}
 				<div className="anchor" ref={anchorRef}></div>
-				<MessageBar />
+				<div className="message-bar">
+					<MessageBar />
+				</div>
 			</div>
 		</div>
 	);

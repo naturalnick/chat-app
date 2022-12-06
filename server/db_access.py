@@ -2,8 +2,10 @@ import psycopg2
 from datetime import datetime
 import pytz
 from helpers import remove_sql_escapes
+from config.config import config
+params = config(config_db = "database.ini")
 
-conn = psycopg2.connect("dbname=chat_app user=postgres host=localhost password=password")
+conn = psycopg2.connect(**params)
 
 def get_users():
 	with conn.cursor() as cur:
@@ -18,7 +20,7 @@ def get_users():
 def create_user(username, password):
 	date = datetime.now().strftime("%m/%d/%Y")
 	with conn.cursor() as cur:
-		cur.execute(f"INSERT INTO users (name, date_created, password, is_online, session_id) VALUES('{username}','{date}', crypt('{password}', gen_salt('bf')), false)")
+		cur.execute(f"INSERT INTO users (name, date_created, password, is_online) VALUES('{username}','{date}', crypt('{password}', gen_salt('bf')), false)")
 		conn.commit()
 
 def verify_user(username, password):
@@ -27,6 +29,12 @@ def verify_user(username, password):
 		record = cur.fetchone()
 		return False if record is None else True
 	
+def check_user_online(username):
+	with conn.cursor() as cur:
+		cur.execute(f"SELECT name FROM users WHERE name = '{username}' AND is_online = true")
+		record = cur.fetchone()
+		return False if record is None else True
+
 def check_user_exists(username):
 	with conn.cursor() as cur:
 		cur.execute(f"SELECT name FROM users WHERE name = '{username}'")

@@ -9,6 +9,7 @@ import "./Login.css";
 
 export default function Login({ setToken }) {
 	const [isRegistering, setIsRegistering] = useState(false);
+	const [loaded, setLoaded] = useState(false);
 	const [error, setError] = useState("");
 	const {
 		register,
@@ -27,6 +28,13 @@ export default function Login({ setToken }) {
 		setFocus("username", { shouldSelect: true });
 	}, [setFocus]);
 
+	useEffect(() => {
+		const fadeInTimer = setTimeout(() => {
+			setLoaded(true);
+		}, 1000);
+		return () => clearTimeout(fadeInTimer);
+	}, []);
+
 	const onSubmit = async (formData) => {
 		const formType = isRegistering ? "register" : "login";
 		const response = await fetch(
@@ -34,12 +42,12 @@ export default function Login({ setToken }) {
 			{
 				method: "POST",
 				headers: {
-					Accept: "application/json",
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(formData),
 			}
 		);
+		console.log(response);
 		const status = response.status;
 		if (status === 200) {
 			const data = await response.json();
@@ -76,7 +84,7 @@ export default function Login({ setToken }) {
 					)}
 				</Form.Group>
 				<Form.Group className="mb-3">
-					<Form.Label>Password (four letters or numbers)</Form.Label>
+					<Form.Label>Password</Form.Label>
 					<Form.Control
 						type="password"
 						placeholder="Password"
@@ -118,8 +126,7 @@ export default function Login({ setToken }) {
 
 	return (
 		<div className="Login">
-			<Stack gap={2} className="mx-auto">
-				<h2>Burble</h2>
+			<Stack gap={2} className={loaded ? "mx-auto" : "hidden mx-auto"}>
 				<h1>{isRegistering ? "Register" : "Sign In"}</h1>
 				<div className="error">{error}</div>
 				{displayForm()}

@@ -12,28 +12,34 @@ export default function MessageBar() {
 	const [input, setInput] = useState("");
 
 	function handleSubmit() {
-		socket.emit("message", { text: input, token: token });
+		if (input !== "") socket.emit("message", { text: input, token: token });
 		setInput("");
 	}
+
+	function handleKeyDown(e) {
+		if (e.key === "Enter") {
+			handleSubmit();
+		}
+	}
+
 	return (
-		<div className="message-bar">
-			<InputGroup>
-				<Form.Control
-					style={{ borderRadius: "0" }}
-					placeholder="Message"
-					aria-label="Message"
-					aria-describedby="message"
-					value={input}
-					onChange={(e) => setInput(e.target.value)}
-				/>
-				<Button
-					style={{ borderRadius: "0" }}
-					onClick={handleSubmit}
-					variant="outline-primary"
-				>
-					Send
-				</Button>
-			</InputGroup>
-		</div>
+		<InputGroup>
+			<Form.Control
+				style={{ borderRadius: "0" }}
+				placeholder="Message"
+				aria-label="Message"
+				aria-describedby="message"
+				value={input}
+				onChange={(e) => setInput(e.target.value)}
+				onKeyDown={handleKeyDown}
+			/>
+			<Button
+				style={{ borderRadius: "0" }}
+				onClick={handleSubmit}
+				variant="outline-primary"
+			>
+				Send
+			</Button>
+		</InputGroup>
 	);
 }
