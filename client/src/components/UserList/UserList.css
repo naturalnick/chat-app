@@ -28,3 +28,10 @@
 	display: inline-block;
 	margin-right: 5px;
 }
+
+@media only screen and (max-width: 768px) {
+	.user-list {
+		border-left: 1px solid lightgray;
+		max-height: 300px;
+	}
+}

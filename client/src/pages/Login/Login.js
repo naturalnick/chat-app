@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Stack from "react-bootstrap/Stack";
@@ -11,28 +11,24 @@ export default function Login({ setToken }) {
 	const [isRegistering, setIsRegistering] = useState(false);
 	const [loaded, setLoaded] = useState(false);
 	const [error, setError] = useState("");
+
 	const {
 		register,
+		getValues,
 		handleSubmit,
 		setFocus,
-		formState: { errors },
+		formState: { errors, isValid },
 	} = useForm();
-
-	const determineError = useMemo(() => {
-		return isRegistering
-			? "Username already exists."
-			: "Username or password is incorrect.";
-	}, [isRegistering]);
 
 	useEffect(() => {
 		setFocus("username", { shouldSelect: true });
-	}, [setFocus]);
+	}, [setFocus, loaded]);
 
 	useEffect(() => {
-		const fadeInTimer = setTimeout(() => {
+		const delayTimer = setTimeout(() => {
 			setLoaded(true);
 		}, 1000);
-		return () => clearTimeout(fadeInTimer);
+		return () => clearTimeout(delayTimer);
 	}, []);
 
 	const onSubmit = async (formData) => {
@@ -47,13 +43,13 @@ export default function Login({ setToken }) {
 				body: JSON.stringify(formData),
 			}
 		);
-		console.log(response);
-		const status = response.status;
-		if (status === 200) {
+		if (response.status === 200) {
 			const data = await response.json();
 			authenticateUser(data.token);
-		} else if (status === 403) {
-			setError(determineError);
+		} else {
+			const error = await response.text();
+			console.error(`${response.status} ${error}`);
+			setError(error);
 		}
 	};
 
@@ -62,74 +58,95 @@ export default function Login({ setToken }) {
 		setToken(usersToken);
 	}
 
-	function displayForm() {
+	function handleKeyDown(e) {
+		if (e.key === "Enter" && isValid) {
+			onSubmit(getValues());
+		}
+	}
+
+	function displayUsernameError() {
 		return (
-			<Form>
-				<Form.Group className="mb-3">
-					<Form.Label>Username</Form.Label>
-					<Form.Control
-						type="text"
-						placeholder="Username"
-						{...register("username", {
-							required: true,
-							minLength: 3,
-							maxLength: 20,
-						})}
-						role="username-input"
-					/>
-					{errors.username && isRegistering && (
-						<Form.Text className="error">
-							A username between 4-20 characters is required.
-						</Form.Text>
-					)}
-				</Form.Group>
-				<Form.Group className="mb-3">
-					<Form.Label>Password</Form.Label>
-					<Form.Control
-						type="password"
-						placeholder="Password"
-						{...register("password", {
-							required: true,
-							minLength: 4,
-							maxLength: 20,
-							// pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/,
-						})}
-					/>
-					{errors.password && isRegistering && (
-						<Form.Text className="error">
-							A four character password is required.
-						</Form.Text>
-					)}
-				</Form.Group>
-				<div className="d-grid">
-					<Button onClick={handleSubmit(onSubmit)} name="submit">
-						{isRegistering ? "Sign Up" : "Sign In"}
-					</Button>
-				</div>
-				<div className="member">
-					{isRegistering ? "Already a member? " : "Not a member? "}
-					<span
-						className="switch-login"
-						onClick={() => {
-							setError("");
-							setIsRegistering(
-								(prevIsRegistering) => !prevIsRegistering
-							);
-						}}
-					>
-						{isRegistering ? "Sign In" : "Register"}
-					</span>
-				</div>
-			</Form>
+			errors.username &&
+			isRegistering && (
+				<Form.Text className="error">
+					A username between 4-20 characters is required.
+				</Form.Text>
+			)
+		);
+	}
+
+	function displayPasswordError() {
+		return (
+			errors.password &&
+			isRegistering && (
+				<Form.Text className="error">
+					A four character password is required.
+				</Form.Text>
+			)
+		);
+	}
+
+	function displayFormTypeSwitch() {
+		return (
+			<div className="member">
+				{isRegistering ? "Already a member? " : "Not a member? "}
+				<span
+					className="switch-login"
+					onClick={() => {
+						setError("");
+						setIsRegistering((prevIsRegistering) => !prevIsRegistering);
+					}}
+				>
+					{isRegistering ? "Sign In" : "Register"}
+				</span>
+			</div>
 		);
 	}
 
 	return (
 		<div className="Login">
 			<Stack gap={2} className={loaded ? "mx-auto" : "hidden mx-auto"}>
-				<h1>{isRegistering ? "Register" : "Sign In"}</h1>
+				<h1 className="signin-title">
+					{isRegistering ? "Register" : "Sign In"}
+				</h1>
 				<div className="error">{error}</div>
-				{displayForm()}
+				<Form>
+					<Form.Group className="mb-3">
+						<Form.Label>Username</Form.Label>
+						<Form.Control
+							type="text"
+							placeholder="Username"
+							{...register("username", {
+								required: true,
+								minLength: 3,
+								maxLength: 20,
+							})}
+							role="username-input"
+						/>
+						{displayUsernameError()}
+					</Form.Group>
+					<Form.Group className="mb-3">
+						<Form.Label>Password</Form.Label>
+						<Form.Control
+							type="password"
+							placeholder="Password"
+							{...register("password", {
+								required: true,
+								minLength: 4,
+								maxLength: 20,
+								// pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/,
+							})}
+							onKeyDown={handleKeyDown}
+						/>
+						{displayPasswordError()}
+					</Form.Group>
+					<div className="d-grid">
+						<Button onClick={handleSubmit(onSubmit)} name="submit">
+							{isRegistering ? "Sign Up" : "Sign In"}
+						</Button>
+					</div>
+					{displayFormTypeSwitch()}
+				</Form>
 			</Stack>
 		</div>
 	);

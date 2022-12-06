@@ -16,9 +16,8 @@
 	visibility: hidden;
 }
 
-h1 {
+.signin-title {
 	color: white;
-	font-weight: bold;
 	text-align: center;
 }
 
