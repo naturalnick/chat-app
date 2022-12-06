@@ -2,7 +2,7 @@ import psycopg2
 from datetime import datetime
 import pytz
 from helpers import remove_sql_escapes, escape_for_sql
-from config.config import config
+from config import config
 params = config(config_db = "database.ini")
 
 conn = psycopg2.connect(**params)
