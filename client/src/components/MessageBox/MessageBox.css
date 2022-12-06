@@ -4,10 +4,21 @@
 }
 
 .message-box {
-	height: 400px;
+	height: 450px;
 	overflow-x: hidden;
 	overflow-y: scroll;
 	overflow-wrap: break-word;
 	border: 1px solid lightgrey;
 	padding: 10px;
+	position: relative;
+}
+
+.message-bar {
+	position: absolute;
+	background-color: #ffffff;
+	width: 98%;
+	bottom: 2%;
+	left: 1%;
+	right: 1%;
+	z-index: 1;
 }
