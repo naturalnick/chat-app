@@ -95,5 +95,3 @@ def update_users():
 if __name__=="__main__":
 	db.set_all_users_offline() # fail-safe if server crashes - always start with all users offline
 	socketio.run(app,debug=True)
-
-sio = socketio.server
