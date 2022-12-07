@@ -24,8 +24,6 @@ export default function Dashboard({ setToken }) {
 	}, [setToken, socket]);
 
 	useEffect(() => {
-		socket.emit("logged_in", token);
-
 		socket.on("request_denied", () => {
 			logout();
 		});
@@ -35,9 +33,11 @@ export default function Dashboard({ setToken }) {
 		socket.on("messages", (messages) => {
 			setMessages(messages);
 		});
+		socket.emit("logged_in", token);
 		return () => {
 			socket.off("request_denied");
 			socket.off("user_list");
+			socket.off("messages");
 		};
 	}, [logout, socket, token]);
 
