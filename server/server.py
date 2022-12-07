@@ -5,7 +5,7 @@ from pathlib import PurePath
 import db_access as db
 from helpers import check_jwt, get_jwt_payload, getToken
 
-path = PurePath(__file__).parent.parent
+path = PurePath(__file__).parent
 app = Flask(__name__, static_folder=f"{path}/client/build", static_url_path="")
 app.config["SECRET_KEY"] = "secret"
 CORS(app, resources={r"/api/*": {"origins": "*"}})
