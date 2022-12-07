@@ -2,10 +2,12 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from pathlib import PurePath
+import os
 import db_access as db
 from helpers import check_jwt, get_jwt_payload, getToken
 
-path = PurePath(__file__).parent
+path = PurePath(os.getcwd()).parent
+
 app = Flask(__name__, static_folder=f"{path}/client/build", static_url_path="")
 app.config["SECRET_KEY"] = "secret"
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -94,5 +96,6 @@ def update_users():
 
 
 if __name__=="__main__":
+	print(path)
 	db.set_all_users_offline() # fail-safe if server crashes - always start with all users offline
 	socketio.run(app,debug=True)
