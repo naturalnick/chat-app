@@ -16,7 +16,7 @@ def index():
 
 @app.errorhandler(404)
 def not_found(e):
-	return app.send_static_file("index.html")
+	return send_from_directory("../client/build", "index.html")
 
 
 @app.route("/api/auth/login", methods=["POST"])
