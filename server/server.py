@@ -1,22 +1,24 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
+from pathlib import PurePath
 import db_access as db
 from helpers import check_jwt, get_jwt_payload, getToken
 
-app = Flask(__name__, static_folder="../client/build", static_url_path="")
+path = PurePath(__file__).parent.parent
+app = Flask(__name__, static_folder=f"{path}/client/build", static_url_path="")
 app.config["SECRET_KEY"] = "secret"
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*") #change * to url of client
 
 @app.route("/")
 def index():
-   return send_from_directory("../client/build", "index.html")
+   return send_from_directory(f"{path}/client/build", "index.html")
 
 
 @app.errorhandler(404)
 def not_found(e):
-	return send_from_directory("../client/build", "index.html")
+	return send_from_directory(f"{path}/client/build", "index.html")
 
 
 @app.route("/api/auth/login", methods=["POST"])
