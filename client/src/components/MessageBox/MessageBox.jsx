@@ -1,24 +1,12 @@
-import { useState, useEffect, useContext, useRef } from "react";
-import { SocketContext } from "../../context/Socket";
-import { TokenContext } from "../../context/Token";
+import { useEffect, useRef } from "react";
+
 import Message from "../Message/Message";
 import MessageBar from "../MessageBar/MessageBar";
 
 import "./MessageBox.css";
 
-export default function MessageBox() {
-	const socket = useContext(SocketContext);
-	const token = useContext(TokenContext);
-
-	const [messages, setMessages] = useState([]);
+export default function MessageBox({ messages }) {
 	const anchorRef = useRef();
-
-	useEffect(() => {
-		socket.on("messages", (messages) => {
-			setMessages(messages);
-		});
-		socket.emit("retrieve_messages", token);
-	}, [socket, token]);
 
 	useEffect(() => {
 		anchorRef.current.scrollIntoView();
@@ -28,13 +16,13 @@ export default function MessageBox() {
 		<Message message={message} />
 	));
 	return (
-		<div>
-			<div className="message-box">
+		<div className="message-container">
+			<div className="message-area">
 				{messageElements}
 				<div className="anchor" ref={anchorRef}></div>
-				<div className="message-bar">
-					<MessageBar />
-				</div>
+			</div>
+			<div className="message-bar">
+				<MessageBar />
 			</div>
 		</div>
 	);
