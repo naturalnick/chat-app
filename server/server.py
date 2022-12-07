@@ -1,17 +1,17 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 import db_access as db
 from helpers import check_jwt, get_jwt_payload, getToken
 
-app = Flask(__name__, static_folder="./client/build", static_url_path="")
+app = Flask(__name__, static_folder="../client/build", static_url_path="")
 app.config["SECRET_KEY"] = "secret"
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*") #change * to url of client
 
 @app.route("/")
 def index():
-   return app.send_static_file("index.html"), 200
+   return send_from_directory("../client/build", "index.html")
 
 
 @app.errorhandler(404)
