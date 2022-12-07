@@ -27,7 +27,7 @@ export default function Login({ setToken }) {
 	useEffect(() => {
 		const delayTimer = setTimeout(() => {
 			setLoaded(true);
-		}, 1000);
+		}, 2000);
 		return () => clearTimeout(delayTimer);
 	}, []);
 
@@ -141,7 +141,11 @@ export default function Login({ setToken }) {
 						{displayPasswordError()}
 					</Form.Group>
 					<div className="d-grid">
-						<Button onClick={handleSubmit(onSubmit)} name="submit">
+						<Button
+							onClick={handleSubmit(onSubmit)}
+							name="submit"
+							variant="outline-primary"
+						>
 							{isRegistering ? "Sign Up" : "Sign In"}
 						</Button>
 					</div>

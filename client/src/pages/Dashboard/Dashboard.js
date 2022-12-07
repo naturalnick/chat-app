@@ -11,6 +11,7 @@ import MessageBox from "../../components/MessageBox/MessageBox";
 import StatusBar from "../../components/StatusBar/StatusBar";
 
 export default function Dashboard({ setToken }) {
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const [users, setUsers] = useState([]);
 	const [messages, setMessages] = useState([]);
 	const socket = useContext(SocketContext);
@@ -22,6 +23,10 @@ export default function Dashboard({ setToken }) {
 		socket.emit("logged_out");
 		socket.disconnect();
 	}, [setToken, socket]);
+
+	useEffect(() => {
+		setIsLoggedIn(true);
+	}, []);
 
 	useEffect(() => {
 		socket.on("request_denied", () => {
@@ -39,7 +44,7 @@ export default function Dashboard({ setToken }) {
 			socket.off("user_list");
 			socket.off("messages");
 		};
-	}, [logout, socket, token]);
+	}, [socket, token, isLoggedIn, logout]);
 
 	return (
 		<Container>
