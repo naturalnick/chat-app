@@ -1,24 +1,28 @@
-.anchor {
-	width: 100%;
-	height: 1px;
+.message-container {
+	height: 450px;
+	position: relative;
+	border: 1px solid lightgrey;
+	padding-bottom: 39px;
 }
 
-.message-box {
-	height: 450px;
+.message-area {
+	height: 411px;
 	overflow-x: hidden;
 	overflow-y: scroll;
 	overflow-wrap: break-word;
-	border: 1px solid lightgrey;
 	padding: 10px;
-	position: relative;
 }
 
 .message-bar {
 	position: absolute;
 	background-color: #ffffff;
-	width: 98%;
-	bottom: 2%;
-	left: 1%;
-	right: 1%;
+	bottom: 0;
+	left: 0;
+	right: 0;
 	z-index: 1;
+}
+
+.anchor {
+	width: 100%;
+	height: 1px;
 }

@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { TokenContext } from "../../context/Token";
 import { SocketContext } from "../../context/Socket";
 
@@ -11,6 +11,8 @@ import MessageBox from "../../components/MessageBox/MessageBox";
 import StatusBar from "../../components/StatusBar/StatusBar";
 
 export default function Dashboard({ setToken }) {
+	const [users, setUsers] = useState([]);
+	const [messages, setMessages] = useState([]);
 	const socket = useContext(SocketContext);
 	const token = useContext(TokenContext);
 
@@ -18,6 +20,7 @@ export default function Dashboard({ setToken }) {
 		localStorage.removeItem("authentication");
 		setToken(null);
 		socket.emit("logged_out");
+		socket.disconnect();
 	}, [setToken, socket]);
 
 	useEffect(() => {
@@ -26,9 +29,15 @@ export default function Dashboard({ setToken }) {
 		socket.on("request_denied", () => {
 			logout();
 		});
-
+		socket.on("user_list", (users) => {
+			setUsers(users);
+		});
+		socket.on("messages", (messages) => {
+			setMessages(messages);
+		});
 		return () => {
 			socket.off("request_denied");
+			socket.off("user_list");
 		};
 	}, [logout, socket, token]);
 
@@ -37,10 +46,10 @@ export default function Dashboard({ setToken }) {
 			<StatusBar logout={logout} />
 			<Row className="g-0">
 				<Col md={9}>
-					<MessageBox />
+					<MessageBox messages={messages} />
 				</Col>
 				<Col md={3}>
-					<UserList />
+					<UserList users={users} />
 				</Col>
 			</Row>
 		</Container>

@@ -55,6 +55,7 @@ def set_logged_in(token):
 		payload = get_jwt_payload(token)
 		db.set_user_status_online(payload["username"], request.sid)
 		update_users()
+		emit("messages", db.get_messages())
 	else: emit("request_denied")
     
 
@@ -62,14 +63,6 @@ def set_logged_in(token):
 def set_logged_out():
 	db.set_user_status_offline(request.sid)
 	update_users()
-
-
-@socketio.on("retrieve_messages")
-def send_messages(token):
-	if token and check_jwt(token):
-		msgs = db.get_messages()
-		emit("messages", msgs)
-	else: emit("request_denied")
 
 
 @socketio.on("message")
