@@ -34,7 +34,7 @@ export default function Login({ setToken }) {
 	const onSubmit = async (formData) => {
 		const formType = isRegistering ? "register" : "login";
 		const response = await fetch(
-			`http://127.0.0.1:5000/api/auth/${formType}`,
+			`https://burble.onrender.com/api/auth/${formType}`,
 			{
 				method: "POST",
 				headers: {
