@@ -8,19 +8,19 @@ from helpers import check_jwt, get_jwt_payload, getToken
 
 path = PurePath(os.getcwd()).parent
 
-app = Flask(__name__, static_folder=f"{path}/client/build", static_url_path="")
+app = Flask(__name__, static_folder=f"{path}/client/build/", static_url_path="")
 app.config["SECRET_KEY"] = "secret"
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*") #change * to url of client
 
 @app.route("/")
 def index():
-   return send_from_directory(f"{path}/client/build", "index.html")
+   return send_from_directory(f"{path}/client/build/", "index.html")
 
 
 @app.errorhandler(404)
 def not_found(e):
-	return send_from_directory(f"{path}/client/build", "index.html")
+	return send_from_directory(f"{path}/client/build/", "index.html")
 
 
 @app.route("/api/auth/login", methods=["POST"])
