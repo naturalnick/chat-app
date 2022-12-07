@@ -4,7 +4,7 @@ from flask_cors import CORS
 import db_access as db
 from helpers import check_jwt, get_jwt_payload, getToken
 
-app = Flask(__name__, static_folder="../client/build", static_url_path="")
+app = Flask(__name__, static_folder="./client/build", static_url_path="")
 app.config["SECRET_KEY"] = "secret"
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*") #change * to url of client
