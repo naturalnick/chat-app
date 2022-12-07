@@ -11,8 +11,7 @@ socketio = SocketIO(app, cors_allowed_origins="*") #change * to url of client
 
 @app.route("/")
 def index():
-	return "hello!"
-   # return app.send_static_file("index.html"), 200
+   return app.send_static_file("index.html"), 200
 
 
 @app.errorhandler(404)
