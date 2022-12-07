@@ -11,7 +11,8 @@ socketio = SocketIO(app, cors_allowed_origins="*") #change * to url of client
 
 @app.route("/")
 def index():
-   return app.send_static_file("index.html"), 200
+	return "hello!"
+   # return app.send_static_file("index.html"), 200
 
 
 @app.errorhandler(404)
@@ -94,3 +95,5 @@ def update_users():
 if __name__=="__main__":
 	db.set_all_users_offline() # fail-safe if server crashes - always start with all users offline
 	socketio.run(app,debug=True)
+
+sio = socketio.server
