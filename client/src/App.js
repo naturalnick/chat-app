@@ -17,9 +17,9 @@ export default function App() {
 	return (
 		<div className="App">
 			{authenticated ? (
-				<Dashboard setToken={setAuthenticated} />
+				<Dashboard setAuthenticated={setAuthenticated} />
 			) : (
-				<Login setToken={setAuthenticated} />
+				<Login setAuthenticated={setAuthenticated} />
 			)}
 		</div>
 	);

@@ -34,12 +34,12 @@ def login():
 	username = request.json["username"]
 	password = request.json["password"]
 	if db.check_user_exists(username) is False:
-		return "Username doesn't exist.", 404, cors_header
+		return "Username doesn't exist.", 404
 	elif db.check_user_online(username) is True:
-		return "User is already logged in.", 403, cors_header
+		return "User is already logged in.", 403
 	elif db.verify_user(username, password):
-		return jsonify({"token": getToken(username)}), 200, cors_header
-	else: return "Username or password is incorrect.", 401, cors_header
+		return jsonify({"token": getToken(username)}), 200
+	else: return "Username or password is incorrect.", 401
 
 @app.route("/api/auth/register", methods=["POST"])
 def register():
@@ -104,4 +104,4 @@ def send_messages():
 
 if __name__=="__main__":
 	db.set_all_users_offline() # fail-safe if server crashes - always start with all users offline
-	socketio.run(app)
+	socketio.run(app, debug=True)
