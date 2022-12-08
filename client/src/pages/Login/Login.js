@@ -42,15 +42,17 @@ export default function Login({ setAuthenticated }) {
 				},
 				body: JSON.stringify(formData),
 			}
-		);
-		// if (response.status === 200) {
-		// 	const data = await response.json();
-		// 	authenticateUser(data.token);
-		// } else {
-		// 	const error = await response.text();
-		// 	console.error(`${response.status} ${error}`);
-		// 	setError(error);
-		// }
+		).catch((error) => {
+			console.error(error);
+		});
+		if (response.status === 200) {
+			const data = await response.json();
+			authenticateUser(data.token);
+		} else {
+			const error = await response.text();
+			console.error(`${response.status} ${error}`);
+			setError(error);
+		}
 	};
 
 	function authenticateUser(usersToken) {
