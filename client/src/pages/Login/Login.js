@@ -34,7 +34,7 @@ export default function Login({ setAuthenticated }) {
 		const formType = isRegistering ? "register" : "login";
 
 		const response = await fetch(
-			`https://0.0.0.0:10000/api/auth/${formType}`,
+			`https://burble.onrender.com/api/auth/${formType}`,
 			{
 				method: "POST",
 				headers: {

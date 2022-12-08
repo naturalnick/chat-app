@@ -10,7 +10,8 @@ load_dotenv()
 
 app = Flask(__name__, static_folder="../client/build", static_url_path="")
 app.config["SECRET_KEY"] = os.environ["FLASK_SECRET"]
-CORS(app)
+cors = CORS(app, resources={r"/api": {"origins": "*"}})
+cors_header = {"Access-Control-Allow-Origin", "*"}
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route("/")
@@ -33,13 +34,12 @@ def login():
 	username = request.json["username"]
 	password = request.json["password"]
 	if db.check_user_exists(username) is False:
-		return "Username doesn't exist.", 404
-	if db.check_user_online(username) is True:
-		return "User is already logged in.", 403
-	if db.verify_user(username, password):
-		return jsonify({"token": getToken(username)}), 200
-	else: return "Username or password is incorrect.", 401
-
+		return "Username doesn't exist.", 404, cors_header
+	elif db.check_user_online(username) is True:
+		return "User is already logged in.", 403, cors_header
+	elif db.verify_user(username, password):
+		return jsonify({"token": getToken(username)}), 200, cors_header
+	else: return "Username or password is incorrect.", 401, cors_header
 
 @app.route("/api/auth/register", methods=["POST"])
 def register():
