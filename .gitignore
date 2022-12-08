@@ -1,6 +1,7 @@
 .DS_Store
-/__pycache__
-/.vscode
+__pycache__
+.vscode
 .pytest_cache
 .vscode/settings.json
 database.ini
+.vscode
