@@ -32,7 +32,7 @@ export default function Login({ setAuthenticated }) {
 
 	async function logInUser() {
 		const formType = isRegistering ? "register" : "login";
-		console.log(getValues);
+		console.log(getValues());
 		const response = await fetch(
 			`https://burble.onrender.com/api/auth/${formType}`,
 			{
