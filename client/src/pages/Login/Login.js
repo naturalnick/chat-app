@@ -32,7 +32,7 @@ export default function Login({ setAuthenticated }) {
 
 	async function logInUser() {
 		const formType = isRegistering ? "register" : "login";
-
+		console.log(getValues);
 		const response = await fetch(
 			`https://burble.onrender.com/api/auth/${formType}`,
 			{
@@ -40,7 +40,7 @@ export default function Login({ setAuthenticated }) {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(getValues),
+				body: JSON.stringify(getValues()),
 			}
 		);
 		if (response.ok) {
@@ -53,8 +53,6 @@ export default function Login({ setAuthenticated }) {
 			setError(error);
 		}
 	}
-
-	console.log("render");
 
 	function authenticateUser(usersToken) {
 		localStorage.setItem("token", usersToken);
