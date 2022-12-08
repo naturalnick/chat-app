@@ -25,6 +25,7 @@ def not_found(e):
 
 @app.route("/api/auth/login", methods=["POST"])
 def login():
+	print(request.json)
 	username = request.json["username"]
 	password = request.json["password"]
 	if db.check_user_exists(username) is False:

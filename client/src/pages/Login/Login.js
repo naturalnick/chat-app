@@ -15,7 +15,6 @@ export default function Login({ setAuthenticated }) {
 	const {
 		register,
 		getValues,
-		handleSubmit,
 		setFocus,
 		formState: { errors, isValid },
 	} = useForm();
@@ -31,7 +30,7 @@ export default function Login({ setAuthenticated }) {
 		return () => clearTimeout(delayTimer);
 	}, []);
 
-	const onSubmit = async (formData) => {
+	async function logInUser() {
 		const formType = isRegistering ? "register" : "login";
 
 		const response = await fetch(
@@ -41,7 +40,7 @@ export default function Login({ setAuthenticated }) {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(formData),
+				body: JSON.stringify(getValues),
 			}
 		);
 		if (response.ok) {
@@ -53,12 +52,9 @@ export default function Login({ setAuthenticated }) {
 			console.error(`${response.status} ${error}`);
 			setError(error);
 		}
-	};
+	}
 
 	console.log("render");
-	onSubmit().catch((error) => {
-		console.error(error);
-	});
 
 	function authenticateUser(usersToken) {
 		localStorage.setItem("token", usersToken);
@@ -67,7 +63,7 @@ export default function Login({ setAuthenticated }) {
 
 	function handleKeyDown(e) {
 		if (e.key === "Enter" && isValid) {
-			onSubmit(getValues());
+			logInUser();
 		}
 	}
 
@@ -148,7 +144,7 @@ export default function Login({ setAuthenticated }) {
 						{displayPasswordError()}
 					</Form.Group>
 					<div className="d-grid">
-						<Button onClick={handleSubmit(onSubmit)} name="submit">
+						<Button onClick={logInUser} name="submit">
 							{isRegistering ? "Sign Up" : "Sign In"}
 						</Button>
 					</div>
