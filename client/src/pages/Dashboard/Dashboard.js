@@ -45,12 +45,14 @@ export default function Dashboard({ setAuthenticated }) {
 
 	return (
 		<Container>
-			{/* <StatusBar logout={logout} token={token} /> */}
+			<StatusBar logout={logout} token={token} />
 			<Row className="g-0">
 				<Col md={9}>
-					{/* <MessageBox messages={messages} socket={socket} token={token} /> */}
+					<MessageBox messages={messages} socket={socket} token={token} />
 				</Col>
-				<Col md={3}>{/* <UserList users={users} /> */}</Col>
+				<Col md={3}>
+					<UserList users={users} />
+				</Col>
 			</Row>
 		</Container>
 	);
