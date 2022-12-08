@@ -33,6 +33,7 @@ export default function Dashboard({ setAuthenticated }) {
 			socket.off("user_list");
 			socket.off("messages");
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	function logout() {
