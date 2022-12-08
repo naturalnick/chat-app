@@ -84,6 +84,10 @@ def test_relay():
 	emit("success")
 
 
+@socketio.on_error()
+def error_handler(e):
+	pass
+
 def update_users():
 	users = db.get_users()
 	emit("user_list", users, broadcast=True)

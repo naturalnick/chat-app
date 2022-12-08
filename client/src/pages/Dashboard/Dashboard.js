@@ -21,11 +21,11 @@ export default function Dashboard({ setAuthenticated }) {
 		socket.on("request_denied", () => {
 			logout();
 		});
-		socket.on("user_list", (users) => {
-			setUsers(users);
+		socket.on("user_list", (updatedUsers) => {
+			setUsers(updatedUsers);
 		});
-		socket.on("messages", (messages) => {
-			setMessages(messages);
+		socket.on("messages", (updatedMessages) => {
+			setMessages(updatedMessages);
 		});
 		socket.emit("logged_in", token);
 		return () => {
@@ -45,14 +45,12 @@ export default function Dashboard({ setAuthenticated }) {
 
 	return (
 		<Container>
-			<StatusBar logout={logout} token={token} />
+			{/* <StatusBar logout={logout} token={token} /> */}
 			<Row className="g-0">
 				<Col md={9}>
-					<MessageBox messages={messages} socket={socket} token={token} />
+					{/* <MessageBox messages={messages} socket={socket} token={token} /> */}
 				</Col>
-				<Col md={3}>
-					<UserList users={users} />
-				</Col>
+				<Col md={3}>{/* <UserList users={users} /> */}</Col>
 			</Row>
 		</Container>
 	);
