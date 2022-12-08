@@ -5,7 +5,7 @@ import MessageBar from "../MessageBar/MessageBar";
 
 import "./MessageBox.css";
 
-export default function MessageBox({ messages }) {
+export default function MessageBox({ socket, token, messages }) {
 	const anchorRef = useRef();
 
 	useEffect(() => {
@@ -15,6 +15,10 @@ export default function MessageBox({ messages }) {
 	const messageElements = messages.map((message) => (
 		<Message message={message} />
 	));
+
+	function handleNewMessage(input) {
+		if (input !== "") socket.emit("message", { text: input, token: token });
+	}
 	return (
 		<div className="message-container">
 			<div className="message-area">
@@ -22,7 +26,7 @@ export default function MessageBox({ messages }) {
 				<div className="anchor" ref={anchorRef}></div>
 			</div>
 			<div className="message-bar">
-				<MessageBar />
+				<MessageBar handleNewMessage={handleNewMessage} />
 			</div>
 		</div>
 	);

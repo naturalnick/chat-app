@@ -7,7 +7,7 @@ import Button from "react-bootstrap/Button";
 
 import "./Login.css";
 
-export default function Login({ setToken }) {
+export default function Login({ setAuthenticated }) {
 	const [isRegistering, setIsRegistering] = useState(false);
 	const [loaded, setLoaded] = useState(false);
 	const [error, setError] = useState("");
@@ -55,7 +55,7 @@ export default function Login({ setToken }) {
 
 	function authenticateUser(usersToken) {
 		localStorage.setItem("authentication", usersToken);
-		setToken(usersToken);
+		setAuthenticated(true);
 	}
 
 	function handleKeyDown(e) {
@@ -141,11 +141,7 @@ export default function Login({ setToken }) {
 						{displayPasswordError()}
 					</Form.Group>
 					<div className="d-grid">
-						<Button
-							onClick={handleSubmit(onSubmit)}
-							name="submit"
-							variant="outline-primary"
-						>
+						<Button onClick={handleSubmit(onSubmit)} name="submit">
 							{isRegistering ? "Sign Up" : "Sign In"}
 						</Button>
 					</div>
