@@ -32,7 +32,6 @@ export default function Login({ setAuthenticated }) {
 
 	async function logInUser() {
 		const formType = isRegistering ? "register" : "login";
-		console.log(getValues());
 		const response = await fetch(
 			`https://burble.onrender.com/api/auth/${formType}`,
 			{
@@ -43,10 +42,11 @@ export default function Login({ setAuthenticated }) {
 				body: JSON.stringify(getValues()),
 			}
 		);
-		if (response.ok) {
+		if (response.status === 200) {
 			const data = await response.json();
-			console.log(data);
 			authenticateUser(data.token);
+		} else if (response.status === 500) {
+			setError("500 Server Error");
 		} else {
 			const error = await response.text();
 			console.error(`${response.status} ${error}`);
