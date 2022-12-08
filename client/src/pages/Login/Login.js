@@ -5,6 +5,7 @@ import Stack from "react-bootstrap/Stack";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
+import { SERVER_URL } from "../../settings";
 import "./Login.css";
 
 export default function Login({ setAuthenticated }) {
@@ -32,16 +33,13 @@ export default function Login({ setAuthenticated }) {
 
 	async function logInUser() {
 		const formType = isRegistering ? "register" : "login";
-		const response = await fetch(
-			`https://burble.onrender.com/api/auth/${formType}`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(getValues()),
-			}
-		);
+		const response = await fetch(`${SERVER_URL}/api/auth/${formType}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(getValues()),
+		});
 		if (response.status === 200) {
 			const data = await response.json();
 			authenticateUser(data.token);
@@ -142,7 +140,12 @@ export default function Login({ setAuthenticated }) {
 						{displayPasswordError()}
 					</Form.Group>
 					<div className="d-grid">
-						<Button onClick={logInUser} name="submit">
+						<Button
+							onClick={() => {
+								if (isValid) logInUser();
+							}}
+							name="submit"
+						>
 							{isRegistering ? "Sign Up" : "Sign In"}
 						</Button>
 					</div>
