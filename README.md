@@ -41,16 +41,16 @@ Screenshot:<br>
 
 ### Client
 
-    1. In client/src directory, open settings.js and change the URL to your host url.
-    2. At the command line in the root directory run 'cd client'.
-    3. Then run 'npm install' to install node package manager.
-    4. Run 'npm run build' to set up static files for server.
+1. In client/src directory, open settings.js and change the URL to your host url.
+2. At the command line in the root directory run 'cd client'.
+3. Then run 'npm install' to install node package manager.
+4. Run 'npm run build' to set up static files for server.
 
 ### Database
 
-    1. Create a PostgreSQL database
-    2. Create a file in the server folder called database.ini
-    3. Insert your database credentials into this file in this format:
+1. Create a PostgreSQL database
+2. Create a file in the server folder called database.ini
+3. Insert your database credentials into this file in this format:
 
 ```
 [postgresql]
@@ -63,15 +63,18 @@ port = port
 
 ### Server
 
-    1. Add another file in your server folder called .env and add your Flask Secret like this
-    	FLASK_SECRET=secret
-    2. Delete the line eventlet==0.30.2 from the requirement.txt file. It's there for deploying purposes, so you can keep it if you're deploying with gunicorn. https://flask-socketio.readthedocs.io/en/latest/deployment.html
-    3. At the command line navigate to your server directory
-    4. Run 'python3 -m venv .venv' to create a virtual environment.
-    5. Run 'source .venv/bin/activate' to activate virtual environment.
-    6. Run 'pip install -r requirements.txt' to install required packages.
-    7. Run 'python3 server.py'
-    8. Server should now be online at the URL in the terminal response.
+1. Add another file in your server folder called .env and add your Flask Secret like this
+
+
+    FLASK_SECRET=secret
+
+2. Delete the line eventlet==0.30.2 from the requirement.txt file. It's there for deploying purposes, so you can keep it if you're deploying with gunicorn. https://flask-socketio.readthedocs.io/en/latest/deployment.html
+3. At the command line navigate to your server directory
+4. Run 'python3 -m venv .venv' to create a virtual environment.
+5. Run 'source .venv/bin/activate' to activate virtual environment.
+6. Run 'pip install -r requirements.txt' to install required packages.
+7. Run 'python3 server.py'
+8. Server should now be online at the URL in the terminal response.
 
 ## Author
 
