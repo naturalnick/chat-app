@@ -1,9 +1,13 @@
 .message {
-	margin-bottom: 2px;
+	margin-bottom: 4px;
 }
 
 .username {
 	font-weight: bold;
+	background-color: #00c2cb;
+	border-radius: 5px;
+	padding: 3px 5px 5px 3px;
+	margin-right: 3px;
 }
 
 .date {

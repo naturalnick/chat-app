@@ -47,9 +47,9 @@ export default function Login({ setAuthenticated }) {
 			authenticateUser(data.token);
 		} else if (response.status === 500) {
 			setError("500 Server Error");
+			console.error(response.error);
 		} else {
 			const error = await response.text();
-			console.error(`${response.status} ${error}`);
 			setError(error);
 		}
 	}
