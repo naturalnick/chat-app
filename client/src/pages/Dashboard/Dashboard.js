@@ -18,6 +18,7 @@ export default function Dashboard({ setAuthenticated }) {
 	const [messages, setMessages] = useState([]);
 
 	useEffect(() => {
+		console.log("logged in");
 		socket.on("request_denied", () => {
 			logout();
 		});
@@ -35,7 +36,7 @@ export default function Dashboard({ setAuthenticated }) {
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
+	console.log("render dashboard");
 	function logout() {
 		localStorage.removeItem("token");
 		setAuthenticated(false);
