@@ -49,8 +49,11 @@ Screenshot:<br>
 ### Database
 
 1. Create a PostgreSQL database
-2. Create a file in the server folder called database.ini
-3. Insert your database credentials into this file in this format:
+2. Add two tables one called users and one called messages.
+3. Add columns to messages in this order: "id"(int), "username"(text), "text"(text), "date_created"(text). All values should be "not null", id should be primary and should auto increment.
+4. Add columns to users in this order: "id"(int), "name"(text), "date_created"(text), "password"(text), "is_online"(boolean), "session_id"(text). All values should be "not null" except for session_id, id should be primary and should auto increment, and name should have a unique constraint.
+5. Create a file in the server folder called database.ini
+6. Insert your database credentials into this file in this format:
 
 ```
 [postgresql]
@@ -65,8 +68,7 @@ port = port
 
 1. Add another file in your server folder called .env and add your Flask Secret like this
 
-
-    FLASK_SECRET=secret
+   FLASK_SECRET=secret
 
 2. Delete the line eventlet==0.30.2 from the requirement.txt file. It's there for deploying purposes, so you can keep it if you're deploying with gunicorn. https://flask-socketio.readthedocs.io/en/latest/deployment.html
 3. At the command line navigate to your server directory
