@@ -28,7 +28,6 @@ def login():
 	username = request.json["username"]
 	password = request.json["password"]
 	if db.check_user_exists(username) is False:
-		print(os.getenv("FLASK_SECRET"))
 		return "Username doesn't exist.", 404
 	if db.check_user_online(username) is True:
 		return "User is already logged in.", 403

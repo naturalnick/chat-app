@@ -33,6 +33,7 @@ export default function Login({ setAuthenticated }) {
 
 	const onSubmit = async (formData) => {
 		const formType = isRegistering ? "register" : "login";
+
 		const response = await fetch(
 			`https://burble.onrender.com/api/auth/${formType}`,
 			{
@@ -42,11 +43,10 @@ export default function Login({ setAuthenticated }) {
 				},
 				body: JSON.stringify(formData),
 			}
-		).catch((error) => {
-			console.error(error);
-		});
-		if (response.status === 200) {
+		);
+		if (response.ok) {
 			const data = await response.json();
+			console.log(data);
 			authenticateUser(data.token);
 		} else {
 			const error = await response.text();
@@ -55,8 +55,13 @@ export default function Login({ setAuthenticated }) {
 		}
 	};
 
+	console.log("render");
+	onSubmit().catch((error) => {
+		console.error(error);
+	});
+
 	function authenticateUser(usersToken) {
-		localStorage.setItem("authentication", usersToken);
+		localStorage.setItem("token", usersToken);
 		setAuthenticated(true);
 	}
 

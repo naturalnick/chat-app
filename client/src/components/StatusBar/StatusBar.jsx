@@ -12,7 +12,7 @@ export default function StatusBar({ logout, token }) {
 	const [name, setName] = useState("");
 
 	useEffect(() => {
-		const token = localStorage.getItem("authentication");
+		const token = localStorage.getItem("token");
 		if (token) {
 			const username = jwt_decode(token).username;
 			setName(username);

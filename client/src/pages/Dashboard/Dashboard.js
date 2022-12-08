@@ -12,7 +12,7 @@ import StatusBar from "../../components/StatusBar/StatusBar";
 const socket = io();
 
 export default function Dashboard({ setAuthenticated }) {
-	const token = localStorage.getItem("authentication");
+	const token = localStorage.getItem("token");
 
 	const [users, setUsers] = useState([]);
 	const [messages, setMessages] = useState([]);
@@ -37,7 +37,7 @@ export default function Dashboard({ setAuthenticated }) {
 	}, []);
 
 	function logout() {
-		localStorage.removeItem("authentication");
+		localStorage.removeItem("token");
 		setAuthenticated(false);
 		socket.emit("logged_out");
 		socket.disconnect();

@@ -6,7 +6,12 @@ import "./App.css";
 
 export default function App() {
 	const [authenticated, setAuthenticated] = useState(() => {
-		return localStorage.getItem("authentication") != null ? true : false;
+		if (
+			localStorage.getItem("token") != null &&
+			localStorage.getItem("token") !== undefined
+		)
+			return true;
+		else return false;
 	});
 
 	return (
