@@ -34,7 +34,7 @@ export default function Login({ setAuthenticated }) {
 		const formType = isRegistering ? "register" : "login";
 
 		const response = await fetch(
-			`http://0.0.0.0:10000/api/auth/${formType}`,
+			`https://0.0.0.0:10000/api/auth/${formType}`,
 			{
 				method: "POST",
 				headers: {
