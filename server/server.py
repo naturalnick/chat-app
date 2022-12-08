@@ -1,17 +1,21 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
+import os
+from dotenv import load_dotenv
 import db_access as db
 from helpers import check_jwt, get_jwt_payload, getToken
 
+load_dotenv()
+
 app = Flask(__name__, static_folder="../client/build", static_url_path="")
-app.config["SECRET_KEY"] = "secret"
+app.config["SECRET_KEY"] = os.environ["FLASK_SECRET"]
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*") #change * to url of client
 
 @app.route("/")
 def index():
-   return app.send_static_file("index.html"), 200
+	return app.send_static_file("index.html"), 200
 
 
 @app.errorhandler(404)
@@ -24,6 +28,7 @@ def login():
 	username = request.json["username"]
 	password = request.json["password"]
 	if db.check_user_exists(username) is False:
+		print(os.getenv("FLASK_SECRET"))
 		return "Username doesn't exist.", 404
 	if db.check_user_online(username) is True:
 		return "User is already logged in.", 403
