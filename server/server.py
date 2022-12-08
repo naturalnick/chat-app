@@ -55,7 +55,7 @@ def set_logged_in(token):
 		payload = get_jwt_payload(token)
 		db.set_user_status_online(payload["username"], request.sid)
 		update_users()
-		emit("messages", db.get_messages())
+		send_messages()
 	else: emit("request_denied")
     
 
@@ -82,6 +82,11 @@ def test_relay():
 def update_users():
 	users = db.get_users()
 	emit("user_list", users, broadcast=True)
+
+
+def send_messages():
+	messages = db.get_messages()
+	emit("messages", messages)
 
 
 if __name__=="__main__":

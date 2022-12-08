@@ -1,5 +1,4 @@
-import { useContext, useState, useEffect, useMemo } from "react";
-import { TokenContext } from "../../context/Token";
+import { useState, useEffect, useMemo } from "react";
 import jwt_decode from "jwt-decode";
 
 import Button from "react-bootstrap/Button";
@@ -9,15 +8,16 @@ import Nav from "react-bootstrap/Nav";
 
 import "./StatusBar.css";
 
-export default function StatusBar({ logout }) {
-	const token = useContext(TokenContext);
+export default function StatusBar({ logout, token }) {
 	const [name, setName] = useState("");
 
-	const getUsersName = useMemo(() => jwt_decode(token).username, [token]);
-
 	useEffect(() => {
-		setName(getUsersName);
-	}, [getUsersName]);
+		const token = localStorage.getItem("authentication");
+		if (token) {
+			const username = jwt_decode(token).username;
+			setName(username);
+		}
+	}, []);
 
 	return (
 		<Navbar expand="md">

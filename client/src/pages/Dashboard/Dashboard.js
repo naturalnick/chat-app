@@ -1,6 +1,5 @@
-import { useCallback, useContext, useEffect, useState } from "react";
-import { TokenContext } from "../../context/Token";
-import { SocketContext } from "../../context/Socket";
+import { useEffect, useState } from "react";
+import io from "socket.io-client";
 
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
@@ -10,23 +9,13 @@ import UserList from "../../components/UserList/UserList";
 import MessageBox from "../../components/MessageBox/MessageBox";
 import StatusBar from "../../components/StatusBar/StatusBar";
 
-export default function Dashboard({ setToken }) {
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
+const socket = io();
+
+export default function Dashboard({ setAuthenticated }) {
+	const token = localStorage.getItem("authentication");
+
 	const [users, setUsers] = useState([]);
 	const [messages, setMessages] = useState([]);
-	const socket = useContext(SocketContext);
-	const token = useContext(TokenContext);
-
-	const logout = useCallback(() => {
-		localStorage.removeItem("authentication");
-		setToken(null);
-		socket.emit("logged_out");
-		socket.disconnect();
-	}, [setToken, socket]);
-
-	useEffect(() => {
-		setIsLoggedIn(true);
-	}, []);
 
 	useEffect(() => {
 		socket.on("request_denied", () => {
@@ -44,14 +33,21 @@ export default function Dashboard({ setToken }) {
 			socket.off("user_list");
 			socket.off("messages");
 		};
-	}, [socket, token, isLoggedIn, logout]);
+	}, []);
+
+	function logout() {
+		localStorage.removeItem("authentication");
+		setAuthenticated(false);
+		socket.emit("logged_out");
+		socket.disconnect();
+	}
 
 	return (
 		<Container>
-			<StatusBar logout={logout} />
+			<StatusBar logout={logout} token={token} />
 			<Row className="g-0">
 				<Col md={9}>
-					<MessageBox messages={messages} />
+					<MessageBox messages={messages} socket={socket} token={token} />
 				</Col>
 				<Col md={3}>
 					<UserList users={users} />
