@@ -9,9 +9,9 @@ export default function App() {
 		if (
 			localStorage.getItem("token") != null &&
 			localStorage.getItem("token") !== undefined
-		)
+		) {
 			return true;
-		else return false;
+		} else return false;
 	});
 
 	return (

@@ -10,8 +10,8 @@ load_dotenv()
 
 app = Flask(__name__, static_folder="../client/build", static_url_path="")
 app.config["SECRET_KEY"] = os.environ["FLASK_SECRET"]
-CORS(app, resources={r"/api/*": {"origins": "*"}})
-socketio = SocketIO(app, cors_allowed_origins="*") #change * to url of client
+CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route("/")
 def index():
@@ -21,6 +21,10 @@ def index():
 @app.errorhandler(404)
 def not_found(e):
 	return app.send_static_file("index.html"), 200
+
+@app.errorhandler(400)
+def not_found(e):
+	return "400 Server - Bad Request", 400	
 
 
 @app.route("/api/auth/login", methods=["POST"])
