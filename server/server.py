@@ -11,7 +11,6 @@ load_dotenv()
 app = Flask(__name__, static_folder="../client/build", static_url_path="")
 app.config["SECRET_KEY"] = os.environ["FLASK_SECRET"]
 cors = CORS(app, resources={r"/api": {"origins": "*"}})
-cors_header = {"Access-Control-Allow-Origin", "*"}
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route("/")
