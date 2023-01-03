@@ -33,7 +33,7 @@ export default function Login({ setAuthenticated }) {
 
 	async function logInUser() {
 		const formType = isRegistering ? "register" : "login";
-		const response = await fetch(`${SERVER_URL}/api/auth/${formType}`, {
+		const response = await fetch(`/api/auth/${formType}`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

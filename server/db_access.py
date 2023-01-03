@@ -2,10 +2,15 @@ import psycopg2
 from datetime import datetime
 import pytz
 from helpers import remove_sql_escapes, escape_for_sql
-from config import config
-params = config()
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-conn = psycopg2.connect(**params)
+host = os.getenv("DB_HOST")
+name = os.getenv("DB_NAME")
+password = os.getenv("DB_PASSWORD")
+
+conn = psycopg2.connect(host=host, port=5432, dbname=name, user=name, password=password)
 
 def get_users():
 	with conn.cursor() as cur:
