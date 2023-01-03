@@ -6,7 +6,7 @@ _A full-stack chat application, made with a Javascript React front-end and a Pyt
 
 <br>
 
-See it in action [here](https://burble.onrender.com). (Render may cause a delay in loading.)
+See it in action [here](https://burblechat.herokuapp.com). (may experience 15 second load delay)
 
 <br>
 
