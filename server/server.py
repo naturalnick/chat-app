@@ -22,6 +22,7 @@ def index():
 def not_found(e):
 	return app.send_static_file("index.html"), 200
 
+
 @app.errorhandler(400)
 def not_found(e):
 	return "400 Server - Bad Request", 400	
@@ -29,16 +30,20 @@ def not_found(e):
 
 @app.route("/api/auth/login", methods=["POST"])
 def login():
-	print(request.json)
 	username = request.json["username"]
 	password = request.json["password"]
+
 	if db.check_user_exists(username) is False:
 		return "Username doesn't exist.", 404
-	elif db.check_user_online(username) is True:
+	elif db.check_user_online(username):
 		return "User is already logged in.", 403
 	elif db.verify_user(username, password):
+		db.set_online_status(username, True)
+		socketio.emit("user", {"name": username, "is_online": True}, broadcast=True)
 		return jsonify({"token": getToken(username)}), 200
-	else: return "Username or password is incorrect.", 401
+	else:
+		return "Username or password is incorrect.", 401
+
 
 @app.route("/api/auth/register", methods=["POST"])
 def register():
@@ -48,57 +53,44 @@ def register():
 		return "Username is already taken.", 403
 	else:
 		db.create_user(username, password)
+		db.set_online_status(username, True)
+		socketio.emit("user", {"name": username, "is_online": True}, broadcast=True)
 		return {"token": getToken(username)}, 200
 
 
-@socketio.on("disconnect")
-def disconnected():
-	db.set_user_status_offline(request.sid)
-	update_users()
+@app.route("/api/auth/logout", methods=["GET"])
+def logout():
+	token = request.headers.get("Authorization")
+	username = get_jwt_payload(token)["username"]
+	db.set_online_status(username, False)
+	socketio.emit("user", {"name": username, "is_online": False}, broadcast=True)
+	return {}, 200
 
 
-@socketio.on("logged_in")
-def set_logged_in(token):
+@app.route("/api/message", methods=["POST"])
+def handle_message():
+	token = request.headers.get("Authorization")
 	if check_jwt(token):
-		payload = get_jwt_payload(token)
-		db.set_user_status_online(payload["username"], request.sid)
-		update_users()
-		send_messages()
-	else: emit("request_denied")
-    
-
-@socketio.on("logged_out")
-def set_logged_out():
-	db.set_user_status_offline(request.sid)
-	update_users()
+		username = get_jwt_payload(token)["username"]
+		message = request.json["message"]
+		new_message = db.create_message(username, message)
+		socketio.emit("message", new_message, broadcast=True)
+		return {}, 200
+	return "Request denied.", 401
 
 
-@socketio.on("message")
-def receive_message(message):
-	if check_jwt(message["token"]):
-		payload = get_jwt_payload(message["token"])
-		db.create_message(payload["username"], message["text"])
-		emit("messages", db.get_messages(), broadcast=True)
-	else: emit("request_denied")
-
-
-@socketio.on("test")
-def test_relay():
-	emit("success")
-
-
-@socketio.on_error()
-def error_handler(e):
-	pass
-
-def update_users():
-	users = db.get_users()
-	emit("user_list", users, broadcast=True)
-
-
+@app.route("/api/messages", methods=["GET"])
 def send_messages():
-	messages = db.get_messages()
-	emit("messages", messages)
+	if check_jwt(request.headers.get("Authorization")):
+		return db.get_messages()
+	return "Request denied.", 401
+
+
+@app.route("/api/users", methods=["GET"])
+def send_users():
+	if check_jwt(request.headers.get("Authorization")):
+		return db.get_users()
+	return "Request denied.", 401
 
 
 if __name__=="__main__":

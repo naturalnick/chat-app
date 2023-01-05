@@ -7,20 +7,24 @@ from dotenv import load_dotenv
 load_dotenv()
 
 host = os.getenv("DB_HOST")
-name = os.getenv("DB_NAME")
+port = os.getenv("DB_PORT")
+dbname = os.getenv("DB_NAME")
+username = os.getenv("DB_USERNAME")
 password = os.getenv("DB_PASSWORD")
 
-conn = psycopg2.connect(host=host, port=5432, dbname=name, user=name, password=password)
+conn = psycopg2.connect(host=host, port=port, dbname=dbname, user=username, password=password)
+
+def create_tables():
+	with conn.cursor() as cur:
+		cur.execute(open("init.sql", "r").read())
+
+create_tables()
 
 def get_users():
 	with conn.cursor() as cur:
-		cur.execute("SELECT name, is_online FROM users ORDER BY is_online DESC, name ASC")
+		cur.execute("SELECT name, is_online FROM users")
 		records = cur.fetchall()
-	users = []
-	for record in records:
-		user_dict = dict(name = record[0], is_online = record[1])
-		users.append(user_dict)
-	return users
+	return [{"name": record[0], "is_online": record[1]} for record in records]
 
 
 def create_user(username, password):
@@ -55,37 +59,25 @@ def get_messages():
 	with conn.cursor() as cur:
 		cur.execute("SELECT * FROM messages ORDER BY id")
 		records = cur.fetchall()
-	messages = []
-	for record in records:
-		msg_dict = dict(id = record[0], username = record[1], text = remove_sql_escapes(record[2]), date_created = record[3])
-		messages.append(msg_dict)
-	return messages
+	return [{"id": record[0], "username": record[1], "text": record[2], "date_created": record[3]} for record in records]
 
 
 def create_message(username, text):
-	date = datetime.now().astimezone(pytz.utc)
-	sql_safe_text = escape_for_sql(text)
+	date = str(datetime.now().astimezone(pytz.utc))
 	with conn.cursor() as cur:
-		cur.execute(f"INSERT INTO messages (username,text,date_created) VALUES('{username}','{sql_safe_text}','{date}')")
+		cur.execute(f"INSERT INTO messages (username,text,date_created) VALUES('{username}','{escape_for_sql(text)}','{date}')")
 		conn.commit()
 
-
-def set_user_status_online(username, session_id):
-	with conn.cursor() as cur:
-		cur.execute(f"UPDATE users SET is_online = true WHERE name = '{username}'")
-		cur.execute(f"UPDATE users SET session_id = '{session_id}' WHERE name = '{username}'")
-		conn.commit()
-
-
-def set_user_status_offline(session_id):
-	with conn.cursor() as cur:
-		cur.execute(f"SELECT name FROM users WHERE session_id = '{session_id}'")
+		cur.execute(f"SELECT * FROM messages WHERE date_created = '{date}'")
 		record = cur.fetchone()
-		if record is not None:
-			username = record[0]
-			cur.execute(f"UPDATE users SET is_online = false WHERE name = '{username}'")
-			cur.execute(f"UPDATE users SET session_id = null WHERE name = '{username}'")
-			conn.commit()
+
+	return {"id": record[0], "username": record[1], "text": remove_sql_escapes(record[2]), "date_created": record[3]}
+
+
+def set_online_status(username, new_status):
+	with conn.cursor() as cur:
+		cur.execute(f"UPDATE users SET is_online = {new_status} WHERE name = '{username}'")
+		conn.commit()
 
 
 def set_all_users_offline():

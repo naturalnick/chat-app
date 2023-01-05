@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
+import { sendMessage } from "../../services/API";
 
 import Message from "../Message/Message";
 import MessageBar from "../MessageBar/MessageBar";
 
 import "./MessageBox.css";
 
-export default function MessageBox({ socket, token, messages }) {
+export default function MessageBox({ token, messages }) {
 	const anchorRef = useRef();
 
 	useEffect(() => {
@@ -13,11 +14,11 @@ export default function MessageBox({ socket, token, messages }) {
 	}, [messages]);
 
 	const messageElements = messages.map((message) => (
-		<Message message={message} />
+		<Message key={message.id} message={message} />
 	));
 
-	function handleNewMessage(input) {
-		if (input !== "") socket.emit("message", { text: input, token: token });
+	async function handleNewMessage(input) {
+		if (input !== "") await sendMessage(token, input);
 	}
 	return (
 		<div className="message-container">
