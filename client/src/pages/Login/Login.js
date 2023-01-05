@@ -5,8 +5,8 @@ import Stack from "react-bootstrap/Stack";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-import { SERVER_URL } from "../../settings";
 import "./Login.css";
+import { getUserToken } from "../../services/API";
 
 export default function Login({ setAuthenticated }) {
 	const [isRegistering, setIsRegistering] = useState(false);
@@ -33,22 +33,13 @@ export default function Login({ setAuthenticated }) {
 
 	async function logInUser() {
 		const formType = isRegistering ? "register" : "login";
-		const response = await fetch(`/api/auth/${formType}`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(getValues()),
-		});
-		if (response.status === 200) {
-			const data = await response.json();
-			authenticateUser(data.token);
-		} else if (response.status === 500) {
-			setError("500 Server Error");
-			console.error(response.error);
-		} else {
-			const error = await response.text();
-			setError(error);
+		const response = await getUserToken(formType, getValues());
+
+		if ("token" in response) {
+			authenticateUser(response.token);
+		}
+		if ("error" in response) {
+			setError(response.error);
 		}
 	}
 
@@ -131,8 +122,6 @@ export default function Login({ setAuthenticated }) {
 							placeholder="Password"
 							{...register("password", {
 								required: true,
-								minLength: 4,
-								maxLength: 20,
 								// pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/,
 							})}
 							onKeyDown={handleKeyDown}

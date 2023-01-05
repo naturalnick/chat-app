@@ -39,44 +39,9 @@ Screenshot:<br>
 
 ## Installation Instructions
 
-### Client
-
-1. In client/src directory, open settings.js and change the URL to your host url.
-2. At the command line in the root directory run 'cd client'.
-3. Then run 'npm install' to install node package manager.
-4. Run 'npm run build' to set up static files for server.
-
-### Database
-
-1. Create a PostgreSQL database
-2. Add two tables one called users and one called messages.
-3. Add columns to messages in this order: "id"(int), "username"(text), "text"(text), "date_created"(text). All values should be "not null", id should be primary and should auto increment.
-4. Add columns to users in this order: "id"(int), "name"(text), "date_created"(text), "password"(text), "is_online"(boolean), "session_id"(text). All values should be "not null" except for session_id, id should be primary and should auto increment, and name should have a unique constraint.
-5. Create a file in the server folder called database.ini
-6. Insert your database credentials into this file in this format:
-
-```
-[postgresql]
-host = host
-database = database
-user = user
-password = password
-port = port
-```
-
-### Server
-
-1. Add another file in your server folder called .env and add your Flask Secret like this
-
-   FLASK_SECRET=secret
-
-2. Delete the line eventlet==0.30.2 from the requirement.txt file. It's there for deploying purposes, so you can keep it if you're deploying with gunicorn. https://flask-socketio.readthedocs.io/en/latest/deployment.html
-3. At the command line navigate to your server directory
-4. Run 'python3 -m venv .venv' to create a virtual environment.
-5. Run 'source .venv/bin/activate' to activate virtual environment.
-6. Run 'pip install -r requirements.txt' to install required packages.
-7. Run 'python3 server.py'
-8. Server should now be online at the URL in the terminal response.
+1. Create a PostgreSQL database and have your username, password and database name ready
+2. At the command line in the root directory run "bash install.sh". When it's finished if everything was entered correctly, your server should be online. If you need to modify credentials edit the .env file found in the server directory.
+3. Open a new command line and at the root directory run "cd client && npm start". This should launch the client in your browser or navigate to the URL provided in the terminal.
 
 ## Author
 
