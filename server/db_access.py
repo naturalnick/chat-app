@@ -16,7 +16,9 @@ conn = psycopg2.connect(host=host, port=port, dbname=dbname, user=username, pass
 
 def create_tables():
 	with conn.cursor() as cur:
-		cur.execute(open("init.sql", "r").read())
+		path = os.path.dirname(os.path.abspath(__file__))
+		cur.execute(open(f"{path}/init.sql", "r").read())
+		conn.commit()
 
 create_tables()
 
