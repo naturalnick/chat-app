@@ -21,5 +21,5 @@ def remove_sql_escapes(text):
 		newText = newText.replace(char, f"{char[0]}")
 	return newText
 
-def getToken(username):
+def generate_token(username):
 	return jwt.encode({"username": username}, "secret", algorithm="HS256")

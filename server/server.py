@@ -4,7 +4,7 @@ from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 import db_access as db
-from helpers import check_jwt, get_jwt_payload, getToken
+from helpers import check_jwt, get_jwt_payload, generate_token
 
 load_dotenv()
 
@@ -40,7 +40,7 @@ def login():
 	elif db.verify_user(username, password):
 		db.set_online_status(username, True)
 		socketio.emit("user", {"name": username, "is_online": True}, broadcast=True)
-		return jsonify({"token": getToken(username)}), 200
+		return jsonify({"token": generate_token(username)}), 200
 	else:
 		return "Username or password is incorrect.", 401
 
@@ -55,7 +55,7 @@ def register():
 		db.create_user(username, password)
 		db.set_online_status(username, True)
 		socketio.emit("user", {"name": username, "is_online": True}, broadcast=True)
-		return {"token": getToken(username)}, 200
+		return {"token": generate_token(username)}, 200
 
 
 @app.route("/api/auth/logout", methods=["GET"])
